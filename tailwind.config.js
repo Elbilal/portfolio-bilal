@@ -5,15 +5,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink:      '#0B1215',
-        surface:  '#121B1F',
-        surface2: '#172327',
-        hair:     'rgba(232,237,233,0.10)',
-        text:     '#E7ECE8',
-        muted:    '#93A3A0',
-        amber:    '#E3A857',
-        teal:     '#5FB8AE',
-        danger:   '#E36857',
+        ink:      'rgb(var(--color-ink) / <alpha-value>)',
+        surface:  'rgb(var(--color-surface) / <alpha-value>)',
+        surface2: 'rgb(var(--color-surface2) / <alpha-value>)',
+        hair:     'var(--color-hair)',
+        text:     'rgb(var(--color-text) / <alpha-value>)',
+        muted:    'rgb(var(--color-muted) / <alpha-value>)',
+        amber:    'rgb(var(--color-amber) / <alpha-value>)',
+        teal:     'rgb(var(--color-teal) / <alpha-value>)',
+        danger:   'rgb(var(--color-danger) / <alpha-value>)',
       },
       fontFamily: {
         display: ['"Space Grotesk"', 'sans-serif'],

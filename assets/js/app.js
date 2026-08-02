@@ -146,9 +146,18 @@ function renderNavigation() {
                 </a>
               </div>
             </div>
+
+            <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Switch to day mode" aria-pressed="false">
+              <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+              <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+            </button>
           </div>
 
-          <div class="md:hidden flex items-center">
+          <div class="md:hidden flex items-center gap-3">
+            <button id="theme-toggle-mobile" type="button" class="theme-toggle" aria-label="Switch to day mode" aria-pressed="false">
+              <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+              <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+            </button>
             <button id="mobile-menu-btn" class="text-text focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
               <i class="fas fa-bars text-xl" aria-hidden="true"></i>
             </button>
@@ -474,10 +483,45 @@ function showToast(message) {
 }
 
 /* ---------------------------------------------------------------------- */
+/* Theme toggle (night / day)                                             */
+/* ---------------------------------------------------------------------- */
+
+const THEME_COLORS = { dark: '#0B1215', light: '#F5F3EE' };
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('theme', theme); } catch (e) { /* storage unavailable — theme just won't persist */ }
+
+  const metaThemeColor = $('theme-color-meta');
+  if (metaThemeColor) metaThemeColor.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+
+  const isLight = theme === 'light';
+  document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach((btn) => {
+    btn.setAttribute('aria-pressed', String(isLight));
+    btn.setAttribute('aria-label', isLight ? 'Switch to night mode' : 'Switch to day mode');
+  });
+}
+
+function initThemeToggle() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current);
+
+  document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      showToast(next === 'light' ? 'Day mode' : 'Night mode');
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------- */
 /* Interaction wiring (nav, scroll progress, reveal, active-section)      */
 /* ---------------------------------------------------------------------- */
 
 function initializeEvents() {
+  initThemeToggle();
+
   const btn = $('mobile-menu-btn');
   const menu = $('mobile-menu');
   if (btn && menu) {
