@@ -63,6 +63,11 @@
         "title": "Tools & methods",
         "icon": "fas fa-tools",
         "items": ["Git & GitHub", "Docker", "AWS", "CI/CD", "Agile / Scrum", "Jest / Testing Library"]
+      },
+      {
+        "title": "Management & methods",
+        "icon": "fas fa-tools",
+        "items": ["Git & GitHub", "Docker", "AWS", "CI/CD", "Agile / Scrum", "Jest / Testing Library"]
       }
     ]
   },
