@@ -20,6 +20,12 @@ const parseIndex = plain(ctx.Terminal.parseIndex);
 const commands = parseIndex(read('terminal/index.md'));
 const builtins = ['help', 'clear', 'reset', 'ls', 'history', 'sudo', 'cat', 'engineer', 'exit'];
 
+// Without it, branch-based GitHub Pages runs Jekyll, which turns every .md with
+// front matter into .html and every command fails with "couldn't load".
+test('.nojekyll exists so Pages serves the .md files as-is', () => {
+  assert.ok(existsSync(root + '.nojekyll'), '.nojekyll is missing from the repo root');
+});
+
 test('index.md lists commands', () => {
   assert.ok(commands.length > 0, 'no commands found in terminal/index.md');
 });

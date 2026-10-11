@@ -53,11 +53,16 @@ output are clickable.
 `terminal/demo.md` shows every supported format, and `terminal/_template.md`
 is a starting point for new commands.
 
+`.nojekyll` must stay in the repo root: without it, GitHub Pages runs Jekyll,
+which converts the command files to `.html` and every command fails with
+"couldn't load".
+
 ### Tests
 
 ```bash
 npm test            # every command in index.md has a valid .md file (runs in CI before deploy)
-npm run test:e2e    # drives the terminal in Chromium (needs a Playwright browser)
+npm run test:e2e    # drives the terminal in Chromium, running every command (needs a Playwright browser)
+SITE_DIR=dist npm run test:e2e   # same, against the folder the deploy workflow publishes
 ```
 
 ## Local development

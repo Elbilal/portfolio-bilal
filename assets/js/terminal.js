@@ -288,7 +288,7 @@ const Terminal = (() => {
       if (doc.body) print(renderMarkdown(doc.body), 'term-md');
     } catch (err) {
       console.error(err);
-      print(`<span class="text-danger">error:</span> couldn't load ${esc(cmd)}.md`);
+      print(`<span class="text-danger">error:</span> couldn't load terminal/${esc(cmd)}.md <span class="text-muted">(${esc(err.message)})</span>`);
     }
   }
 

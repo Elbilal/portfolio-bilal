@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const root = fileURLToPath(new URL('..', import.meta.url));
+// SITE_DIR=dist serves the folder the deploy workflow publishes instead of the repo.
+const root = process.env.SITE_DIR
+  ? join(fileURLToPath(new URL('..', import.meta.url)), process.env.SITE_DIR, '/')
+  : fileURLToPath(new URL('..', import.meta.url));
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.md': 'text/markdown' };
 const server = createServer(async (req, res) => {
   const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[/\\])+/, '');
@@ -90,6 +93,25 @@ try {
     await input.press('Control+c');
     assert.equal(await input.inputValue(), '');
   });
+
+  // Run every command help lists, like a visitor clicking through them all.
+  const listed = await page.evaluate(async () => {
+    const md = await (await fetch('terminal/index.md')).text();
+    return [...md.matchAll(/^\s*[-*]\s+`?([\w-]+)`?\s*(?:—|–|-|:)/gm)].map((m) => m[1]);
+  });
+  for (const name of listed) {
+    await step(`command "${name}" loads its file`, async () => {
+      await input.pressSequentially('clear');
+      await input.press('Enter');
+      await input.pressSequentially(name);
+      await input.press('Enter');
+      await page.waitForFunction(() => /\S/.test(document.querySelector('[data-term-log]').innerText.split('\n').slice(1).join('')));
+      await page.waitForTimeout(150);
+      const out = await log();
+      assert.doesNotMatch(out, /error:|command not found/, out);
+      assert.match(out, /const \w+ = \{/, 'front matter was not printed');
+    });
+  }
 
   await step('clear empties the screen', async () => {
     await input.pressSequentially('clear');
