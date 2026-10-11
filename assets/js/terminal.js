@@ -25,6 +25,8 @@ const Terminal = (() => {
 
   let els = {};
   let initial = null;           // { var, fields } shown on load
+  let current = null;           // { var, fields } the const currently holds
+  let constState = 'shown';     // 'shown' | 'erasing' | 'erased' | 'typing'
   let registry = null;          // [{ name, description }]
   const aliasMap = new Map();   // alias -> command name
   const cache = new Map();      // command name -> parsed doc
@@ -42,12 +44,15 @@ const Terminal = (() => {
 
   async function loadRegistry() {
     if (registry) return registry;
-    const md = await fetchText(DIR + 'index.md');
-    registry = md.split('\n')
+    registry = parseIndex(await fetchText(DIR + 'index.md'));
+    return registry;
+  }
+
+  function parseIndex(md) {
+    return md.split('\n')
       .map((l) => l.match(/^\s*[-*]\s+`?([\w-]+)`?\s*(?:—|–|-|:)\s*(.+)$/))
       .filter(Boolean)
       .map(([, name, description]) => ({ name: name.toLowerCase(), description: description.trim() }));
-    return registry;
   }
 
   function parseScalar(v) {
@@ -167,24 +172,63 @@ const Terminal = (() => {
     return out;
   }
 
-  function showConst(varName, fields) {
-    const segs = constSegments(varName, fields);
-    const total = segs.reduce((n, [t]) => n + t.length, 0);
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CARET = '<span class="caret"> </span>';
+  const segLength = (segs) => segs.reduce((n, [t]) => n + t.length, 0);
+
+  // Animate the visible character count from `from` to `to`, then call done().
+  function animate(segs, from, to, frames, done) {
     const token = ++typingToken;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const caret = '<span class="caret"> </span>';
-
-    if (reduced) { els.code.innerHTML = segmentsToHTML(segs); return; }
-
-    const perFrame = Math.max(3, Math.ceil(total / 45)); // ~0.75s regardless of size
-    let shown = 0;
-    const step = () => {
+    if (reducedMotion()) { els.code.innerHTML = segmentsToHTML(segs, to); done?.(); return; }
+    const step = Math.max(2, Math.ceil(Math.abs(to - from) / frames));
+    let shown = from;
+    const tick = () => {
       if (token !== typingToken) return;
-      shown = Math.min(total, shown + perFrame);
-      els.code.innerHTML = segmentsToHTML(segs, shown) + (shown < total ? caret : '');
-      if (shown < total) requestAnimationFrame(step);
+      shown = to > from ? Math.min(to, shown + step) : Math.max(to, shown - step);
+      els.code.innerHTML = segmentsToHTML(segs, shown) + (shown !== to || to === 0 ? CARET : '');
+      if (shown !== to) requestAnimationFrame(tick); else done?.();
     };
-    step();
+    tick();
+  }
+
+  // Hold the window's height while the const is empty so the page doesn't jump.
+  function lockHeight(on) {
+    const box = els.code.parentElement;
+    box.style.minHeight = on ? `${box.offsetHeight}px` : '';
+  }
+
+  function setWaiting(text) {
+    els.code.innerHTML = `<span class="text-muted">${esc(text)}</span>${CARET}`;
+  }
+
+  // Backspace the const away; the window waits for the next command.
+  function eraseConst() {
+    if (constState === 'erased' || constState === 'erasing') return;
+    lockHeight(true);
+    constState = 'erasing';
+    const segs = constSegments(current.var, current.fields);
+    animate(segs, segLength(segs), 0, 18, () => {
+      constState = 'erased';
+      setWaiting('// awaiting command…');
+    });
+  }
+
+  // Type a const in from empty.
+  function fillConst(varName, fields) {
+    current = { var: varName, fields };
+    lockHeight(true);
+    constState = 'typing';
+    const segs = constSegments(varName, fields);
+    animate(segs, 0, segLength(segs), 45, () => {
+      constState = 'shown';
+      lockHeight(false);
+    });
+  }
+
+  // Bring back whatever the const held before the user started typing.
+  function restoreConst() {
+    if (constState === 'shown') return;
+    fillConst(current.var, current.fields);
   }
 
   /* ---------------- output ---------------- */
@@ -194,7 +238,11 @@ const Terminal = (() => {
     div.className = `term-out ${cls}`;
     div.innerHTML = html;
     els.log.appendChild(div);
-    els.screen.scrollTop = els.screen.scrollHeight;
+    scrollToPrompt();
+  }
+
+  function scrollToPrompt() {
+    requestAnimationFrame(() => { els.screen.scrollTop = els.screen.scrollHeight; });
   }
 
   function echo(cmd) {
@@ -217,7 +265,7 @@ const Terminal = (() => {
   async function run(raw) {
     const input = raw.trim();
     echo(input);
-    if (!input) return;
+    if (!input) { restoreConst(); return; }
     history.push(input);
     historyIdx = history.length;
 
@@ -229,37 +277,52 @@ const Terminal = (() => {
 
     try {
       switch (cmd) {
-        case 'help': case '?': print(await helpText()); return;
-        case 'clear': case 'cls': els.log.innerHTML = ''; return;
+        case 'help': case '?': restoreConst(); print(await helpText()); return;
+        case 'clear': case 'cls': restoreConst(); els.log.innerHTML = ''; return;
         case 'reset': case 'engineer':
-          showConst(initial.var, initial.fields);
+          fillConst(initial.var, initial.fields);
           print('<span class="text-muted">// const restored</span>');
           return;
         case 'ls': {
+          restoreConst();
           const reg = await loadRegistry();
           print(reg.map((c) => `<span class="term-cmd" data-cmd="${esc(c.name)}">${esc(c.name)}.md</span>`).join('  '));
           return;
         }
         case 'history':
+          restoreConst();
           print(history.map((h, i) => `<span class="text-muted">${String(i + 1).padStart(3)}</span>  ${esc(h)}`).join('<br>'));
           return;
         case 'sudo':
+          restoreConst();
           print('<span class="text-danger">nice try.</span> <span class="text-muted">this incident will be reported.</span>');
           return;
       }
 
       const name = await resolve(cmd);
       if (!name) {
+        restoreConst();
         print(`<span class="text-danger">command not found:</span> ${esc(cmd)} <span class="text-muted">— type</span> <span class="term-cmd" data-cmd="help">help</span>`);
         return;
       }
-      const doc = await loadCommand(name);
-      showConst(doc.meta.var || name, doc.fields);
+      eraseConst();
+      const [doc] = await Promise.all([loadCommand(name), waitForErase()]);
+      setWaiting(`// reading terminal/${name}.md…`);
+      await new Promise((r) => setTimeout(r, reducedMotion() ? 0 : 220));
+      fillConst(doc.meta.var || name, doc.fields);
       if (doc.body) print(renderMarkdown(doc.body), 'term-md');
     } catch (err) {
       console.error(err);
+      restoreConst();
       print(`<span class="text-danger">error:</span> couldn't load ${esc(cmd)}.md`);
     }
+  }
+
+  function waitForErase() {
+    return new Promise((resolve) => {
+      const check = () => (constState === 'erasing' ? requestAnimationFrame(check) : resolve());
+      check();
+    });
   }
 
   async function complete() {
@@ -268,8 +331,21 @@ const Terminal = (() => {
     const reg = await loadRegistry();
     const names = [...reg.map((c) => c.name), ...Object.keys(BUILTINS)];
     const matches = names.filter((n) => n.startsWith(value));
-    if (matches.length === 1) els.input.value = matches[0] + ' ';
+    if (matches.length === 1) { els.input.value = matches[0]; syncMirror(); }
     else if (matches.length > 1) { echo(els.input.value); print(matches.map(esc).join('  '), 'text-muted'); }
+  }
+
+  // The real <input> is invisible; this draws its text with a block cursor.
+  function syncMirror() {
+    if (!els.mirror) return;
+    const v = els.input.value;
+    const focused = document.activeElement === els.input;
+    const pos = els.input.selectionStart ?? v.length;
+    const under = v[pos] ?? ' ';
+    els.mirror.classList.toggle('is-focused', focused);
+    els.mirror.innerHTML = !v && !focused
+      ? `<span class="term-placeholder">${esc(els.input.placeholder)}</span>`
+      : `${esc(v.slice(0, pos))}<span class="term-cursor">${esc(under)}</span>${esc(v.slice(pos + 1))}`;
   }
 
   /* ---------------- wiring ---------------- */
@@ -280,43 +356,69 @@ const Terminal = (() => {
       screen: root.querySelector('[data-term-screen]'),
       log: root.querySelector('[data-term-log]'),
       input: root.querySelector('[data-term-input]'),
+      mirror: root.querySelector('[data-term-mirror]'),
       promptText: prompt,
     };
     if (!els.code || !els.input) return;
     initial = { var: varName, fields };
+    current = initial;
     els.code.innerHTML = segmentsToHTML(constSegments(varName, fields));
+
+    const login = new Date().toString().split(' GMT')[0];
+    print(`<span class="text-muted">Last login: ${esc(login)} on ttys001</span>`);
+    print(`<span class="text-muted">type</span> <span class="term-cmd" data-cmd="help">help</span> <span class="text-muted">to list commands, or try</span> <span class="term-cmd" data-cmd="about">about</span>`);
+
+    // Typing anything wipes the const; deleting back to nothing restores it.
+    els.input.addEventListener('input', () => {
+      if (els.input.value.trim()) eraseConst(); else restoreConst();
+      syncMirror();
+    });
+    ['keyup', 'click', 'select', 'focus', 'blur'].forEach((ev) => els.input.addEventListener(ev, syncMirror));
+    els.input.addEventListener('focus', scrollToPrompt);
+    syncMirror();
 
     els.input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         const v = els.input.value;
         els.input.value = '';
+        syncMirror();
         run(v);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (historyIdx > 0) els.input.value = history[--historyIdx];
+        if (historyIdx > 0) { els.input.value = history[--historyIdx]; eraseConst(); }
+        syncMirror();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         historyIdx = Math.min(history.length, historyIdx + 1);
         els.input.value = history[historyIdx] ?? '';
+        if (els.input.value) eraseConst(); else restoreConst();
+        syncMirror();
       } else if (e.key === 'Tab') {
         e.preventDefault();
         complete();
       } else if (e.key === 'l' && e.ctrlKey) {
         e.preventDefault();
         els.log.innerHTML = '';
+      } else if (e.key === 'c' && e.ctrlKey && els.input.selectionStart === els.input.selectionEnd) {
+        e.preventDefault();
+        echo(`${els.input.value}^C`);
+        els.input.value = '';
+        syncMirror();
+        restoreConst();
       }
     });
 
     // Clickable command names in output run that command.
     root.addEventListener('click', (e) => {
       const target = e.target.closest('[data-cmd]');
-      if (target) { run(target.dataset.cmd); els.input.focus({ preventScroll: true }); return; }
+      if (target) { els.input.value = ''; syncMirror(); run(target.dataset.cmd); els.input.focus({ preventScroll: true }); return; }
       if (!e.target.closest('a') && !window.getSelection()?.toString()) els.input.focus({ preventScroll: true });
     });
 
     warmAliases().catch(() => {});
   }
 
-  return { mount };
+  // parseDoc / parseIndex are exposed for tests/commands.test.mjs.
+  return { mount, parseDoc, parseIndex };
 })();

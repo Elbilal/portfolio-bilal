@@ -42,8 +42,23 @@ Markdown file in `terminal/`:
   Markdown body below it is printed as the command's output (headings, bullet
   lists, `**bold**`, `` `code` `` and `[links](url)` are supported).
 
+As soon as a visitor starts typing, the `const` erases itself; when the
+command runs it is retyped from that command's file (deleting the input, or
+running a built-in, brings the previous one back).
+
 Built-in commands: `help`, `ls`, `clear`, `reset`, `history`. Tab completes,
-↑/↓ walk the history, and command names in the output are clickable.
+↑/↓ walk the history, Ctrl+C cancels, Ctrl+L clears, and command names in the
+output are clickable.
+
+`terminal/demo.md` shows every supported format, and `terminal/_template.md`
+is a starting point for new commands.
+
+### Tests
+
+```bash
+npm test            # every command in index.md has a valid .md file (runs in CI before deploy)
+npm run test:e2e    # drives the terminal in Chromium (needs a Playwright browser)
+```
 
 ## Local development
 

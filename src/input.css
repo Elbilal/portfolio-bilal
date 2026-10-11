@@ -243,12 +243,26 @@
   }
   .term-cmd:hover { color: theme('colors.amber'); }
   .term-code { color: theme('colors.teal'); background: theme('colors.surface2'); padding: 0 .3rem; border-radius: 3px; }
-  .term-line { display: flex; align-items: center; gap: .6rem; }
-  .term-input {
-    flex: 1; min-width: 0; background: transparent; border: 0; outline: none; padding: 0;
-    color: theme('colors.text'); font: inherit; caret-color: theme('colors.amber');
+  .term-line { display: flex; align-items: center; gap: .6rem; cursor: text; }
+  .term-field { position: relative; flex: 1; min-width: 0; }
+  .term-mirror {
+    display: block; white-space: pre; overflow: hidden; color: theme('colors.text');
+    min-height: 1.6em;
   }
-  .term-input::placeholder { color: theme('colors.muted'); opacity: .45; }
+  .term-input {
+    position: absolute; inset: 0; width: 100%; padding: 0; border: 0; outline: none;
+    background: transparent; font: inherit; color: transparent; caret-color: transparent;
+  }
+  .term-input::placeholder { color: transparent; }
+  .term-input::selection { background: rgb(var(--color-amber) / .3); color: transparent; }
+  .term-cursor {
+    outline: 1px solid theme('colors.amber'); outline-offset: -1px;
+  }
+  .term-mirror.is-focused .term-cursor {
+    outline: 0; background: theme('colors.amber'); color: #171208;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  .term-placeholder { color: theme('colors.muted'); opacity: .5; }
   /* Mobile browsers zoom into inputs under 16px. */
-  @media (max-width: 640px) { .term-input { font-size: 16px; } }
+  @media (max-width: 640px) { .term-input, .term-mirror { font-size: 16px; } }
 }

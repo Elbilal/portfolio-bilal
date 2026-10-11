@@ -10,3 +10,4 @@ this folder. To add a command, create `<name>.md` here and list it below as
 - projects — things I've built
 - education — where I studied
 - contact — how to reach me
+- demo — sandbox showing every supported format
