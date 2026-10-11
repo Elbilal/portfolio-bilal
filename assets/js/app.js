@@ -200,7 +200,6 @@ function renderRail() {
 
 function renderHero() {
   const { greeting, headline, description, ctaText, image, focusAreas, status } = portfolioData.hero;
-  const focusLines = (focusAreas || []).map((f) => `  <span class="text-teal">"${escapeHTML(f)}"</span>,`).join('\n');
 
   $('hero').innerHTML = `
     <div class="order-2 md:order-1 reveal">
@@ -219,7 +218,7 @@ function renderHero() {
     </div>
 
     <div class="order-1 md:order-2 reveal">
-      <div class="code-window schematic overflow-hidden max-w-md mx-auto">
+      <div class="code-window schematic overflow-hidden max-w-md mx-auto" id="hero-terminal">
         <div class="flex items-center gap-2 px-4 py-3 border-b border-hair">
           <span class="code-dot bg-[#5a4230]"></span>
           <span class="code-dot bg-[#5a5230]"></span>
@@ -227,22 +226,34 @@ function renderHero() {
           <span class="ml-3 font-mono text-xs text-muted">profile.js</span>
         </div>
         <div class="p-5 font-mono text-sm leading-relaxed overflow-x-auto">
-<pre class="whitespace-pre-wrap"><span class="text-muted">const</span> <span class="text-teal">engineer</span> = {
-  name: <span class="text-amber">"${escapeHTML(portfolioData.meta.name)}"</span>,
-  role: <span class="text-amber">"${escapeHTML(portfolioData.meta.role)}"</span>,
-  focus: [
-${focusLines}
-  ],
-  status: <span class="text-amber">"${escapeHTML(status || '')}"</span><span class="caret"> </span>
-};</pre>
+<pre class="whitespace-pre-wrap" data-term-const></pre>
         </div>
-        <div class="px-5 pb-5 flex items-center gap-3">
+        <div class="term-screen" data-term-screen>
+          <div data-term-log aria-live="polite">
+            <p class="term-out text-muted">// interactive shell — type <span class="term-cmd" data-cmd="help">help</span> or try <span class="term-cmd" data-cmd="about">about</span></p>
+          </div>
+          <label class="term-line">
+            <span class="text-teal shrink-0">guest@bilal:~$</span>
+            <input type="text" data-term-input class="term-input" spellcheck="false" autocomplete="off" autocapitalize="off" enterkeyhint="send" aria-label="Terminal command" placeholder="help">
+          </label>
+        </div>
+        <div class="px-5 py-4 flex items-center gap-3 border-t border-hair">
           <img src="${portfolioData.hero.image}" alt="${escapeHTML(portfolioData.meta.name)}" width="44" height="44" loading="eager" fetchpriority="high" class="rounded-md border border-hair">
           <span class="font-mono text-xs text-muted">// avatar.png loaded</span>
         </div>
       </div>
     </div>
   `;
+
+  Terminal.mount($('hero-terminal'), {
+    varName: 'engineer',
+    fields: {
+      name: portfolioData.meta.name,
+      role: portfolioData.meta.role,
+      focus: focusAreas || [],
+      status: status || '',
+    },
+  });
 }
 
 function renderAbout() {

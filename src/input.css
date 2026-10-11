@@ -219,4 +219,36 @@
     transition: all .25s ease;
   }
   .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---- hero terminal ---- */
+  .term-screen {
+    border-top: 1px solid theme('colors.hair');
+    background: rgb(var(--color-ink) / .55);
+    padding: .9rem 1.25rem 1rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: .8rem; line-height: 1.6;
+    max-height: 16rem; overflow-y: auto; cursor: text;
+    overscroll-behavior: contain;
+  }
+  .term-out { margin-bottom: .45rem; color: theme('colors.muted'); word-break: break-word; }
+  .term-out p { margin-bottom: .35rem; }
+  .term-md { color: theme('colors.text'); }
+  .term-list { margin: 0 0 .4rem; padding: 0; list-style: none; }
+  .term-list li { position: relative; padding-left: 1.1rem; margin-bottom: .2rem; }
+  .term-list li::before { content: '›'; position: absolute; left: 0; color: theme('colors.amber'); }
+  .term-help { margin: 0 0 .5rem; padding: 0; list-style: none; }
+  .term-help li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .5rem; }
+  .term-cmd {
+    color: theme('colors.teal'); cursor: pointer;
+    text-decoration: underline dotted rgb(var(--color-teal) / .5); text-underline-offset: 3px;
+  }
+  .term-cmd:hover { color: theme('colors.amber'); }
+  .term-code { color: theme('colors.teal'); background: theme('colors.surface2'); padding: 0 .3rem; border-radius: 3px; }
+  .term-line { display: flex; align-items: center; gap: .6rem; }
+  .term-input {
+    flex: 1; min-width: 0; background: transparent; border: 0; outline: none; padding: 0;
+    color: theme('colors.text'); font: inherit; caret-color: theme('colors.amber');
+  }
+  .term-input::placeholder { color: theme('colors.muted'); opacity: .45; }
+  /* Mobile browsers zoom into inputs under 16px. */
+  @media (max-width: 640px) { .term-input { font-size: 16px; } }
 }

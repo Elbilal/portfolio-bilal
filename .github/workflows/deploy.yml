@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html data.json robots.txt sitemap.xml site.webmanifest dist/
-          cp -r assets dist/
+          cp -r assets terminal dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
