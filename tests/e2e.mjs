@@ -39,36 +39,41 @@ try {
     assert.match(await constText(), /const engineer = \{/);
   });
 
-  await step('typing erases the const', async () => {
+  const isShell = () => page.locator('#hero-terminal').evaluate((el) => el.classList.contains('is-shell'));
+  const waitShell = (on) => page.waitForFunction((on) => document.querySelector('#hero-terminal').classList.contains('is-shell') === on, on);
+
+  await step('typing hides the const and opens the shell', async () => {
     await input.focus();
     await input.pressSequentially('ski');
-    await page.waitForFunction(() => document.querySelector('[data-term-const]').innerText.includes('awaiting'));
+    await waitShell(true);
+    assert.equal((await constText()).trim(), '');
   });
 
-  await step('deleting the input brings the const back', async () => {
+  await step('deleting the input keeps the shell open', async () => {
     await input.fill('');
     await input.dispatchEvent('input');
-    await page.waitForFunction(() => /const engineer = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
+    await page.waitForTimeout(300);
+    assert.equal(await isShell(), true);
   });
 
-  await step('a command refills the const from its .md file', async () => {
+  await step('a command prints its .md file in the terminal', async () => {
     await input.pressSequentially('skills');
     await input.press('Enter');
-    await page.waitForFunction(() => /const stack = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
+    await page.waitForFunction(() => /const stack = \{/.test(document.querySelector('[data-term-log]').innerText));
     assert.match(await log(), /AI & automation/);
+    assert.equal(await isShell(), true);
   });
 
   await step('aliases work (whoami → about)', async () => {
     await input.pressSequentially('whoami');
     await input.press('Enter');
-    await page.waitForFunction(() => /const me = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
+    await page.waitForFunction(() => /const me = \{/.test(document.querySelector('[data-term-log]').innerText));
   });
 
-  await step('unknown commands report an error and keep the const', async () => {
+  await step('unknown commands report an error', async () => {
     await input.pressSequentially('rm -rf /');
     await input.press('Enter');
-    await page.waitForFunction(() => /const me = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
-    assert.match(await log(), /command not found: rm/);
+    await page.waitForFunction(() => /command not found: rm/.test(document.querySelector('[data-term-log]').innerText));
   });
 
   await step('Tab completes a command', async () => {
@@ -76,26 +81,27 @@ try {
     await input.press('Tab');
     assert.equal(await input.inputValue(), 'education');
     await input.press('Enter');
-    await page.waitForFunction(() => /const education = \{/.test(document.querySelector('[data-term-const]').innerText));
+    await page.waitForFunction(() => /const education = \{/.test(document.querySelector('[data-term-log]').innerText));
   });
 
-  await step('ArrowUp recalls history', async () => {
+  await step('ArrowUp recalls history, Ctrl+C cancels', async () => {
     await input.press('ArrowUp');
     assert.equal(await input.inputValue(), 'education');
     await input.press('Control+c');
     assert.equal(await input.inputValue(), '');
   });
 
-  await step('reset restores the original const', async () => {
-    await input.pressSequentially('reset');
-    await input.press('Enter');
-    await page.waitForFunction(() => /const engineer = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
-  });
-
   await step('clear empties the screen', async () => {
     await input.pressSequentially('clear');
     await input.press('Enter');
     assert.equal((await log()).trim(), '');
+  });
+
+  await step('reset closes the shell and brings the const back', async () => {
+    await input.pressSequentially('reset');
+    await input.press('Enter');
+    await waitShell(false);
+    await page.waitForFunction(() => /const engineer = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
   });
 
   await step('no page errors', async () => assert.deepEqual(errors, []));

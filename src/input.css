@@ -229,6 +229,20 @@
     max-height: 16rem; overflow-y: auto; cursor: text;
     overscroll-behavior: contain;
   }
+  /* Once the visitor types, the const panel folds away and the shell takes the window. */
+  .term-const-wrap {
+    display: grid; grid-template-rows: 1fr; opacity: 1;
+    transition: grid-template-rows .35s ease, opacity .25s ease;
+  }
+  .term-const-wrap > * { overflow: hidden; min-height: 0; transition: padding .35s ease; }
+  .is-shell .term-const-wrap { grid-template-rows: 0fr; opacity: 0; }
+  .is-shell .term-const-wrap > * { padding-top: 0; padding-bottom: 0; }
+  .is-shell .term-screen { border-top-color: transparent; min-height: 20rem; max-height: 26rem; }
+  .term-screen { transition: min-height .35s ease, max-height .35s ease; }
+  .term-const {
+    margin: 0 0 .4rem; padding: .6rem .8rem; white-space: pre-wrap; font: inherit;
+    background: theme('colors.surface'); border: 1px solid theme('colors.hair'); border-radius: 6px;
+  }
   .term-out { margin-bottom: .45rem; color: theme('colors.muted'); word-break: break-word; }
   .term-out p { margin-bottom: .35rem; }
   .term-md { color: theme('colors.text'); }

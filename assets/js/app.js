@@ -225,8 +225,10 @@ function renderHero() {
           <span class="code-dot bg-[#2f5a3d]"></span>
           <span class="ml-3 font-mono text-xs text-muted">profile.js</span>
         </div>
-        <div class="p-5 font-mono text-sm leading-relaxed overflow-x-auto">
+        <div class="term-const-wrap">
+          <div class="p-5 font-mono text-sm leading-relaxed overflow-x-auto">
 <pre class="whitespace-pre-wrap" data-term-const></pre>
+          </div>
         </div>
         <div class="term-screen" data-term-screen>
           <div data-term-log aria-live="polite"></div>
