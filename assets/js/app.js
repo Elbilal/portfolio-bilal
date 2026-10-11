@@ -229,12 +229,13 @@ function renderHero() {
 <pre class="whitespace-pre-wrap" data-term-const></pre>
         </div>
         <div class="term-screen" data-term-screen>
-          <div data-term-log aria-live="polite">
-            <p class="term-out text-muted">// interactive shell — type <span class="term-cmd" data-cmd="help">help</span> or try <span class="term-cmd" data-cmd="about">about</span></p>
-          </div>
+          <div data-term-log aria-live="polite"></div>
           <label class="term-line">
             <span class="text-teal shrink-0">guest@bilal:~$</span>
-            <input type="text" data-term-input class="term-input" spellcheck="false" autocomplete="off" autocapitalize="off" enterkeyhint="send" aria-label="Terminal command" placeholder="help">
+            <span class="term-field">
+              <span class="term-mirror" data-term-mirror aria-hidden="true"></span>
+              <input type="text" data-term-input class="term-input" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" enterkeyhint="send" aria-label="Terminal command" placeholder="type a command…">
+            </span>
           </label>
         </div>
         <div class="px-5 py-4 flex items-center gap-3 border-t border-hair">
