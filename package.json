@@ -1,7 +1,7 @@
 {
   "name": "elbadaouy-bilal-portfolio",
   "version": "1.0.0",
-  "description": "Personal portfolio site — content-driven via data.json, built with Tailwind CSS.",
+  "description": "Personal portfolio site — content-driven via locales/*.json (en, fr, ar), built with Tailwind CSS.",
   "private": true,
   "scripts": {
     "dev": "npx serve . -l 5173",

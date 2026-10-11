@@ -20,7 +20,8 @@
       "canonical": "https://elbilal.github.io/portfolio-bilal/",
       "ogImage": "https://placehold.co/1200x630/121B1F/E3A857?text=Elbadaouy+Bilal",
       "themeColor": "#0B1215"
-    }
+    },
+    "locale": "en_US"
   },
   "hero": {
     "greeting": "hello_world();",
@@ -189,5 +190,77 @@
     "title": "Get in touch",
     "description": "Whether you have a question about my experience across banking and enterprise systems, or just want to connect, my inbox is always open. I'll try my best to get back to you.",
     "buttonText": "Say hello"
+  },
+  "ui": {
+    "languageName": "English",
+    "skipToContent": "Skip to content",
+    "nav": {
+      "about": "about",
+      "skills": "skills",
+      "projects": "projects",
+      "contact": "contact",
+      "resume": "resume",
+      "resumeHeading": "Résumé",
+      "resumeEn": "English (PDF)",
+      "resumeFr": "Français (PDF)",
+      "toggleMenu": "Toggle menu",
+      "dayMode": "Switch to day mode",
+      "nightMode": "Switch to night mode",
+      "language": "Language",
+      "sectionProgress": "Section progress",
+      "jumpTo": "Jump to",
+      "dayToast": "Day mode",
+      "nightToast": "Night mode"
+    },
+    "hero": {
+      "github": "github"
+    },
+    "about": {
+      "notes": "// profile.notes<br>status: curious, caffeinated"
+    },
+    "skills": {
+      "heading": "stack"
+    },
+    "projects": {
+      "filterLabel": "Filter projects by technology",
+      "all": "all",
+      "noResults": "// no projects match this filter",
+      "repo": "GitHub repo",
+      "demo": "live demo",
+      "screenshot": "screenshot"
+    },
+    "contact": {
+      "copyEmail": "copy email",
+      "copied": "copied!",
+      "copiedToast": "Email copied to clipboard"
+    },
+    "footer": {
+      "builtBy": "designed & built by",
+      "backToTop": "Back to top"
+    },
+    "terminal": {
+      "lastLogin": "Last login: {date} on ttys001",
+      "intro": "type {help} to list commands, or try {about}",
+      "placeholder": "type a command…",
+      "inputLabel": "Terminal command",
+      "helpAbout": "about me:",
+      "helpShell": "shell:",
+      "builtins": {
+        "help": "list available commands",
+        "clear": "clear the terminal",
+        "reset": "close the shell, bring back the const",
+        "ls": "list command files",
+        "history": "show previous commands",
+        "lang": "switch language: lang en | fr | ar"
+      },
+      "notFound": "command not found:",
+      "tryHelp": "— type",
+      "loadError": "couldn't load",
+      "restored": "// const restored — start typing to open the shell again",
+      "sudo": "nice try.",
+      "sudoTail": "this incident will be reported.",
+      "langUsage": "usage: lang en | fr | ar",
+      "langSwitching": "switching language…"
+    }
   }
 }

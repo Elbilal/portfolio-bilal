@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "name": "Elbadaouy Bilal",
+    "logoName": "ElbadaouyBilal",
+    "role": "مهندس برمجيات",
+    "email": "bilal.elbadaouy.work@gmail.com",
+    "location": "الرباط، المغرب",
+    "resume": {
+      "en": "#english-version",
+      "fr": "#french-version"
+    },
+    "socials": {
+      "github": "https://github.com/bilal-eng-dv",
+      "linkedin": "https://www.linkedin.com/in/bilal-elbadaouy-a4702719a/",
+      "twitter": "https://twitter.com"
+    },
+    "seo": {
+      "title": "Elbadaouy Bilal — مهندس برمجيات",
+      "description": "Elbadaouy Bilal مهندس برمجيات متكامل (Full-stack) متخصص في تطبيقات الويب والهاتف المتينة والقابلة للتوسع. اكتشف مشاريعه في Java وSpring Boot وReact.",
+      "canonical": "https://elbilal.github.io/portfolio-bilal/?lang=ar",
+      "ogImage": "https://placehold.co/1200x630/121B1F/E3A857?text=Elbadaouy+Bilal",
+      "themeColor": "#0B1215"
+    },
+    "locale": "ar_MA"
+  },
+  "hero": {
+    "greeting": "hello_world();",
+    "headline": "أبني أنظمة متينة للويب.",
+    "description": "مهندس برمجيات متكامل متخصص في تصميم وتطوير وصيانة تطبيقات متينة وقابلة للتوسع. أعمل حاليًا على خدمات التنقيط الوطنية وتحديث المنصات المركزية في بنك المغرب.",
+    "ctaText": "اطّلع على أعمالي",
+    "image": "https://placehold.co/200x200/172327/E3A857?text=EB",
+    "focusAreas": [
+      "هندسة الخدمات المصغّرة",
+      "التطوير المتكامل",
+      "دمج الذكاء الاصطناعي"
+    ],
+    "status": "منفتح على المشكلات المثيرة للاهتمام",
+    "available": true
+  },
+  "about": {
+    "title": "نبذة عني",
+    "paragraphs": [
+      "مرحبًا! أنا بلال، مهندس برمجيات متكامل يحفّزه التحدي التقني ويشغفه الابتكار. أركّز على تصميم وتطوير وصيانة تطبيقات ويب وهاتف متينة وقابلة للتوسع.",
+      "تخرّجت من المدرسة الوطنية للعلوم التطبيقية بفاس (ENSA Fès) بشهادة في هندسة المعلوميات. ومنذ ذلك الحين أتيحت لي فرصة العمل في مجالات التكنولوجيا الزراعية وبرمجيات المؤسسات والقطاع البنكي الوطني. أعمل حاليًا على بناء خدمات التنقيط الوطنية للمقاولات الصغيرة جدًا والصغرى والمتوسطة، وتحديث المنصات المركزية في بنك المغرب.",
+      "أستكشف باستمرار أدوات وأساليب جديدة، خاصة هندسة الخدمات المصغّرة والأتمتة بالذكاء الاصطناعي باستخدام أدوات مثل GitHub Copilot وRAG والنماذج اللغوية الكبيرة."
+    ],
+    "icon": "fas fa-code",
+    "stats": [
+      {
+        "value": "4+",
+        "label": "سنوات من الخبرة"
+      },
+      {
+        "value": "5",
+        "label": "مناصب مهنية"
+      },
+      {
+        "value": "3",
+        "label": "لغات أتحدثها"
+      }
+    ]
+  },
+  "skills": {
+    "title": "المهارات التقنية",
+    "categories": [
+      {
+        "title": "الواجهات الأمامية",
+        "icon": "fas fa-desktop",
+        "items": [
+          "React",
+          "Angular",
+          "TypeScript",
+          "Material UI",
+          "Bootstrap",
+          "Redux"
+        ]
+      },
+      {
+        "title": "الواجهات الخلفية",
+        "icon": "fas fa-server",
+        "items": [
+          "Java / Spring Boot",
+          "Python",
+          "C# / ASP.NET Core",
+          "Microservices",
+          "Hibernate",
+          "Keycloak"
+        ]
+      },
+      {
+        "title": "قواعد البيانات وDevOps",
+        "icon": "fas fa-tools",
+        "items": [
+          "Oracle",
+          "PostgreSQL",
+          "Docker & Kubernetes",
+          "GitLab CI/CD",
+          "MongoDB",
+          "Firebase"
+        ]
+      },
+      {
+        "title": "الذكاء الاصطناعي والأتمتة",
+        "icon": "fas fa-robot",
+        "items": [
+          "GitHub Copilot",
+          "Prompt Engineering",
+          "RAG",
+          "Ollama",
+          "LLMs",
+          "Claude CLI"
+        ]
+      }
+    ]
+  },
+  "projects": {
+    "title": "أعمال مختارة",
+    "featured": [
+      {
+        "title": "خدمات التنقيط الوطنية للمقاولات الصغيرة والمتوسطة",
+        "type": "مشروع بارز",
+        "description": "تصميم وتطوير خدمات التنقيط الوطنية للمقاولات الصغيرة جدًا والصغرى والمتوسطة في بنك المغرب، ونمذجة المواصفات الوظيفية ومسارات العمل باستخدام Vizor Builder.",
+        "tech": [
+          "Java",
+          "Spring Boot",
+          "Oracle",
+          "Microservices"
+        ],
+        "github": "#",
+        "live": "#",
+        "image": "https://placehold.co/800x500/121B1F/93A3A0?text=Scoring+Services",
+        "reverse": false
+      },
+      {
+        "title": "منصة التفاعل مع العملاء",
+        "type": "مشروع بارز",
+        "description": "دمج وتحسين منصة للتفاعل مع العملاء لدى Sopra Banking Software، وتحويل بنيتها إلى خدمات مصغّرة ودمج وحدة لإدارة المنتجات.",
+        "tech": [
+          "React",
+          "TypeScript",
+          "Spring Boot",
+          "Keycloak"
+        ],
+        "github": "#",
+        "live": "#",
+        "image": "https://placehold.co/800x500/121B1F/93A3A0?text=Customer+Engagement",
+        "reverse": true
+      }
+    ],
+    "otherTitle": "مشاريع أخرى جديرة بالذكر",
+    "other": [
+      {
+        "title": "منصة للتكنولوجيا الزراعية",
+        "description": "تطوير منصة متجاوبة للتكنولوجيا الزراعية بواجهة خلفية متينة وواجهة حديثة خلال عملي لدى Twins Gestion du terroir.",
+        "tech": [
+          "Spring Boot",
+          "Angular",
+          "PostgreSQL"
+        ],
+        "github": "#",
+        "live": ""
+      },
+      {
+        "title": "منصة CMS مؤتمتة",
+        "description": "تطوير موقع لإدارة المحتوى بمسارات عمل مؤتمتة خلال تدريبي كمطوّر ويب لدى DevBay.",
+        "tech": [
+          "PHP",
+          "Laravel",
+          "Bootstrap"
+        ],
+        "github": "#",
+        "live": "#"
+      },
+      {
+        "title": "إعادة تصميم نظام إدارة المنتجات",
+        "description": "تحديث البنية إلى خدمات مصغّرة وترجمة احتياجات العمل إلى قصص مستخدم لنظام برمجي بنكي.",
+        "tech": [
+          "Spring Boot",
+          "React",
+          "PostgreSQL"
+        ],
+        "github": "#",
+        "live": ""
+      }
+    ]
+  },
+  "contact": {
+    "step": "reach_out()",
+    "preTitle": "ما التالي؟",
+    "title": "تواصل معي",
+    "description": "سواء كان لديك سؤال عن خبرتي في الأنظمة البنكية وأنظمة المؤسسات، أو أردت فقط التواصل، فبريدي مفتوح دائمًا. سأبذل قصارى جهدي للرد عليك.",
+    "buttonText": "قل مرحبًا"
+  },
+  "ui": {
+    "languageName": "العربية",
+    "skipToContent": "انتقل إلى المحتوى",
+    "nav": {
+      "about": "نبذة",
+      "skills": "المهارات",
+      "projects": "المشاريع",
+      "contact": "تواصل",
+      "resume": "السيرة الذاتية",
+      "resumeHeading": "السيرة الذاتية",
+      "resumeEn": "English (PDF)",
+      "resumeFr": "Français (PDF)",
+      "toggleMenu": "فتح القائمة",
+      "dayMode": "التبديل إلى الوضع النهاري",
+      "nightMode": "التبديل إلى الوضع الليلي",
+      "language": "اللغة",
+      "sectionProgress": "تقدّم الأقسام",
+      "jumpTo": "انتقل إلى",
+      "dayToast": "الوضع النهاري",
+      "nightToast": "الوضع الليلي"
+    },
+    "hero": {
+      "github": "github"
+    },
+    "about": {
+      "notes": "// profile.notes<br>الحالة: فضولي، مدمن قهوة"
+    },
+    "skills": {
+      "heading": "التقنيات"
+    },
+    "projects": {
+      "filterLabel": "تصفية المشاريع حسب التقنية",
+      "all": "الكل",
+      "noResults": "// لا توجد مشاريع تطابق هذا الفلتر",
+      "repo": "مستودع GitHub",
+      "demo": "عرض مباشر",
+      "screenshot": "لقطة شاشة"
+    },
+    "contact": {
+      "copyEmail": "نسخ البريد",
+      "copied": "تم النسخ!",
+      "copiedToast": "تم نسخ البريد الإلكتروني"
+    },
+    "footer": {
+      "builtBy": "تصميم وتطوير",
+      "backToTop": "العودة إلى الأعلى"
+    },
+    "terminal": {
+      "lastLogin": "آخر تسجيل دخول: {date} على ttys001",
+      "intro": "اكتب {help} لعرض الأوامر، أو جرّب {about}",
+      "placeholder": "اكتب أمرًا…",
+      "inputLabel": "أمر الطرفية",
+      "helpAbout": "عني:",
+      "helpShell": "الطرفية:",
+      "builtins": {
+        "help": "عرض الأوامر المتاحة",
+        "clear": "مسح الطرفية",
+        "reset": "إغلاق الطرفية وإظهار الـ const",
+        "ls": "عرض ملفات الأوامر",
+        "history": "عرض الأوامر السابقة",
+        "lang": "تغيير اللغة: lang en | fr | ar"
+      },
+      "notFound": "أمر غير موجود:",
+      "tryHelp": "— اكتب",
+      "loadError": "تعذّر تحميل",
+      "restored": "// تمت استعادة الـ const — ابدأ الكتابة لفتح الطرفية من جديد",
+      "sudo": "محاولة جيدة.",
+      "sudoTail": "سيتم الإبلاغ عن هذه الواقعة.",
+      "langUsage": "الاستخدام: lang en | fr | ar",
+      "langSwitching": "جارٍ تغيير اللغة…"
+    }
+  }
+}

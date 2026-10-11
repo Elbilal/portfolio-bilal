@@ -39,8 +39,8 @@ jobs:
       - name: Assemble deployable site
         run: |
           mkdir -p dist
-          cp index.html data.json robots.txt sitemap.xml site.webmanifest .nojekyll dist/
-          cp -r assets terminal dist/
+          cp index.html robots.txt sitemap.xml site.webmanifest .nojekyll dist/
+          cp -r assets locales terminal dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

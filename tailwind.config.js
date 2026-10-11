@@ -16,9 +16,11 @@ module.exports = {
         danger:   'rgb(var(--color-danger) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        sans: ['"IBM Plex Sans"', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'monospace'],
+        // IBM Plex Sans Arabic covers Arabic glyphs; Google Fonts only downloads
+        // it on pages that actually contain Arabic text.
+        display: ['"Space Grotesk"', '"IBM Plex Sans Arabic"', 'sans-serif'],
+        sans: ['"IBM Plex Sans"', '"IBM Plex Sans Arabic"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', '"IBM Plex Sans Arabic"', 'monospace'],
       },
       boxShadow: {
         window: '0 20px 60px -20px rgba(0,0,0,0.6)',
