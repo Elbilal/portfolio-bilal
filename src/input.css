@@ -68,11 +68,13 @@
 
 @layer components {
   .skip-link {
-    position: absolute; left: -9999px; top: 0; z-index: 100;
+    /* Parked above the viewport (not off to the side) so it can't widen the
+       page in right-to-left layouts. */
+    position: absolute; inset-inline-start: 0; top: 0; z-index: 100; transform: translateY(-110%);
     background: theme('colors.amber'); color: #171208; padding: .75rem 1.25rem;
-    font-family: 'IBM Plex Mono', monospace; font-size: .85rem; border-radius: 0 0 6px 0;
+    font-family: 'IBM Plex Mono', monospace; font-size: .85rem; border-end-end-radius: 6px;
   }
-  .skip-link:focus { left: 0; }
+  .skip-link:focus { transform: none; }
 
   /* ---- signature: scroll rail ---- */
   #rail {
@@ -95,7 +97,7 @@
     position: relative; transition: all .25s ease; cursor: pointer;
   }
   .rail-node .rail-tag {
-    position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+    position: absolute; inset-inline-start: 22px; top: 50%; transform: translateY(-50%);
     font-family: 'IBM Plex Mono', monospace; font-size: .68rem; letter-spacing: .08em;
     color: theme('colors.muted'); background: theme('colors.surface'); padding: .2rem .5rem;
     border: 1px solid theme('colors.hair'); border-radius: 3px; white-space: nowrap;
@@ -186,7 +188,7 @@
 
   /* ---- new: back-to-top ---- */
   #back-to-top {
-    position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 40;
+    position: fixed; inset-inline-end: 1.25rem; bottom: 1.25rem; z-index: 40;
     width: 44px; height: 44px; border-radius: 50%;
     background: theme('colors.surface'); border: 1px solid theme('colors.hair'); color: theme('colors.text');
     display: flex; align-items: center; justify-content: center;
@@ -247,8 +249,9 @@
   .term-out p { margin-bottom: .35rem; }
   .term-md { color: theme('colors.text'); }
   .term-list { margin: 0 0 .4rem; padding: 0; list-style: none; }
-  .term-list li { position: relative; padding-left: 1.1rem; margin-bottom: .2rem; }
-  .term-list li::before { content: '›'; position: absolute; left: 0; color: theme('colors.amber'); }
+  .term-list li { position: relative; padding-inline-start: 1.1rem; margin-bottom: .2rem; }
+  .term-list li::before { content: '›'; position: absolute; inset-inline-start: 0; color: theme('colors.amber'); }
+  [dir='rtl'] .term-list li::before { content: '‹'; }
   .term-help { margin: 0 0 .5rem; padding: 0; list-style: none; }
   .term-help li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .5rem; }
   .term-cmd {
@@ -279,4 +282,28 @@
   .term-placeholder { color: theme('colors.muted'); opacity: .5; }
   /* Mobile browsers zoom into inputs under 16px. */
   @media (max-width: 640px) { .term-input, .term-mirror { font-size: 16px; } }
+
+  /* ---- language switcher ---- */
+  .lang-switch {
+    display: inline-flex; align-items: center; gap: 2px; padding: 2px;
+    border: 1px solid theme('colors.hair'); border-radius: 8px; background: theme('colors.surface');
+  }
+  .lang-option {
+    font-family: 'IBM Plex Mono', 'IBM Plex Sans Arabic', monospace; font-size: .72rem; line-height: 1;
+    min-width: 30px; height: 30px; padding: 0 .45rem; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: theme('colors.muted'); transition: all .2s ease;
+  }
+  .lang-option:hover { color: theme('colors.text'); background: theme('colors.surface2'); }
+  .lang-option.is-current { background: theme('colors.amber'); color: #171208; font-weight: 600; }
+
+  /* ---- right-to-left (Arabic) ---- */
+  /* Arrows and "external link" icons point the reading direction. */
+  [dir='rtl'] .flip-rtl { display: inline-block; transform: scaleX(-1); }
+  /* The scroll rail sits on the reading-start side. */
+  [dir='rtl'] #rail { left: auto; right: 2.75rem; }
+  /* Letter-spacing breaks the joins between Arabic letters. */
+  html[lang='ar'] body * { letter-spacing: 0 !important; }
+  /* Arabic needs a little more line height than Latin text. */
+  html[lang='ar'] body { line-height: 1.75; }
 }

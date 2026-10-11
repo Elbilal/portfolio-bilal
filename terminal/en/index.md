@@ -1,8 +1,10 @@
 # Terminal commands
 
 Every command typed in the hero terminal is loaded from a Markdown file in
-this folder. To add a command, create `<name>.md` here and list it below as
-`- <name> — <short description>`. The list order is the order `help` shows.
+this folder (French and Arabic versions live in ../fr and ../ar, with the same
+command names). To add a command, create `<name>.md` in each language folder
+and list it below as `- <name> — <short description>`. The list order is the
+order `help` shows.
 
 - about — who I am
 - experience — where I've worked

@@ -96,7 +96,7 @@ try {
 
   // Run every command help lists, like a visitor clicking through them all.
   const listed = await page.evaluate(async () => {
-    const md = await (await fetch('terminal/index.md')).text();
+    const md = await (await fetch(`terminal/${document.documentElement.lang}/index.md`)).text();
     return [...md.matchAll(/^\s*[-*]\s+`?([\w-]+)`?\s*(?:—|–|-|:)/gm)].map((m) => m[1]);
   });
   for (const name of listed) {
@@ -124,6 +124,70 @@ try {
     await input.press('Enter');
     await waitShell(false);
     await page.waitForFunction(() => /const engineer = \{[\s\S]*\};/.test(document.querySelector('[data-term-const]').innerText));
+  });
+
+  /* ---------------- languages ---------------- */
+
+  const locales = Object.fromEntries(await Promise.all(['en', 'fr', 'ar'].map(async (l) =>
+    [l, JSON.parse(await readFile(join(root, `locales/${l}.json`), 'utf8'))])));
+
+  for (const lang of ['en', 'fr', 'ar']) {
+    const ui = locales[lang];
+    await step(`[${lang}] page renders in ${lang}`, async () => {
+      await page.goto(`${url}?lang=${lang}`);
+      await input.waitFor();
+      assert.equal(await page.getAttribute('html', 'lang'), lang);
+      assert.equal(await page.getAttribute('html', 'dir'), lang === 'ar' ? 'rtl' : 'ltr');
+      assert.equal(await page.title(), ui.meta.seo.title);
+      assert.equal((await page.locator('[data-nav="about"]').innerText()).trim(), ui.ui.nav.about);
+      assert.equal((await page.locator('#hero h2').first().innerText()).trim(), ui.hero.headline);
+      assert.match(await page.locator('#about-container').innerText(), new RegExp(ui.about.paragraphs[0].slice(0, 20).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+      assert.match(await page.locator('#contact-container').innerText(), new RegExp(ui.contact.title));
+      assert.match(await log(), new RegExp(ui.ui.terminal.lastLogin.split('{date}')[0].trim()));
+    });
+
+    await step(`[${lang}] every command loads its ${lang} file`, async () => {
+      const names = await page.evaluate(async (l) => {
+        const md = await (await fetch(`terminal/${l}/index.md`)).text();
+        return [...md.matchAll(/^\s*[-*]\s+`?([\w-]+)`?\s*(?:—|–|-|:)/gm)].map((m) => m[1]);
+      }, lang);
+      assert.ok(names.length > 0);
+      for (const name of names) {
+        await input.pressSequentially('clear'); await input.press('Enter');
+        await input.pressSequentially(name); await input.press('Enter');
+        await page.waitForFunction(() => /const \w+ = \{/.test(document.querySelector('[data-term-log]').innerText));
+        await page.waitForTimeout(100);
+        assert.doesNotMatch(await log(), /error:|command not found|commande introuvable|أمر غير موجود/, `${lang}/${name}`);
+      }
+    });
+
+    await step(`[${lang}] no horizontal scroll on desktop`, async () => {
+      const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      assert.ok(over <= 0, `page is ${over}px wider than the viewport`);
+    });
+  }
+
+  await step('the language a visitor picks is remembered', async () => {
+    await page.goto(`${url}?lang=fr`);
+    await input.waitFor();
+    await page.goto(url);
+    await input.waitFor();
+    assert.equal(await page.getAttribute('html', 'lang'), 'fr');
+  });
+
+  await step('nav switcher changes language', async () => {
+    await page.locator('nav .lang-option[hreflang="ar"]').first().click();
+    await page.waitForFunction(() => document.documentElement.lang === 'ar');
+    await input.waitFor();
+    assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+  });
+
+  await step('`lang en` in the terminal switches back to English', async () => {
+    await input.pressSequentially('lang en');
+    await input.press('Enter');
+    await page.waitForFunction(() => document.documentElement.lang === 'en');
+    await input.waitFor();
+    assert.equal(await page.getAttribute('html', 'dir'), 'ltr');
   });
 
   await step('no page errors', async () => assert.deepEqual(errors, []));

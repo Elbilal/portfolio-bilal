@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "name": "Elbadaouy Bilal",
+    "logoName": "ElbadaouyBilal",
+    "role": "Ingénieur logiciel",
+    "email": "bilal.elbadaouy.work@gmail.com",
+    "location": "Rabat, Maroc",
+    "resume": {
+      "en": "#english-version",
+      "fr": "#french-version"
+    },
+    "socials": {
+      "github": "https://github.com/bilal-eng-dv",
+      "linkedin": "https://www.linkedin.com/in/bilal-elbadaouy-a4702719a/",
+      "twitter": "https://twitter.com"
+    },
+    "seo": {
+      "title": "Elbadaouy Bilal — Ingénieur logiciel",
+      "description": "Elbadaouy Bilal est un ingénieur logiciel full-stack spécialisé dans les applications web et mobiles robustes et évolutives. Découvrez ses projets en Java, Spring Boot et React.",
+      "canonical": "https://elbilal.github.io/portfolio-bilal/?lang=fr",
+      "ogImage": "https://placehold.co/1200x630/121B1F/E3A857?text=Elbadaouy+Bilal",
+      "themeColor": "#0B1215"
+    },
+    "locale": "fr_FR"
+  },
+  "hero": {
+    "greeting": "hello_world();",
+    "headline": "Je construis des systèmes robustes pour le web.",
+    "description": "Ingénieur logiciel full-stack spécialisé dans la conception, le développement et la maintenance d'applications robustes et évolutives. Actuellement concentré sur les services nationaux de scoring et la modernisation des plateformes centrales à Bank Al-Maghrib.",
+    "ctaText": "Voir mes projets",
+    "image": "https://placehold.co/200x200/172327/E3A857?text=EB",
+    "focusAreas": [
+      "architecture microservices",
+      "développement full-stack",
+      "intégration de l'IA"
+    ],
+    "status": "ouvert aux problèmes intéressants",
+    "available": true
+  },
+  "about": {
+    "title": "À propos",
+    "paragraphs": [
+      "Bonjour ! Je suis Bilal, ingénieur logiciel full-stack motivé par les défis techniques et passionné par l'innovation. Je me concentre sur la conception, le développement et la maintenance d'applications web et mobiles robustes et évolutives.",
+      "Je suis diplômé de l'ENSA Fès en génie informatique. Depuis, j'ai eu l'occasion de travailler dans l'agritech, les logiciels d'entreprise et le secteur bancaire national. Aujourd'hui, je développe principalement les services nationaux de scoring TPE/PME et je modernise les plateformes centrales à Bank Al-Maghrib.",
+      "J'explore en continu de nouveaux outils et de nouvelles méthodes, en particulier les architectures microservices et l'automatisation par l'IA avec des outils comme GitHub Copilot, le RAG et les LLM."
+    ],
+    "icon": "fas fa-code",
+    "stats": [
+      {
+        "value": "4+",
+        "label": "années d'expérience"
+      },
+      {
+        "value": "5",
+        "label": "postes occupés"
+      },
+      {
+        "value": "3",
+        "label": "langues parlées"
+      }
+    ]
+  },
+  "skills": {
+    "title": "Compétences techniques",
+    "categories": [
+      {
+        "title": "Frontend",
+        "icon": "fas fa-desktop",
+        "items": [
+          "React",
+          "Angular",
+          "TypeScript",
+          "Material UI",
+          "Bootstrap",
+          "Redux"
+        ]
+      },
+      {
+        "title": "Backend",
+        "icon": "fas fa-server",
+        "items": [
+          "Java / Spring Boot",
+          "Python",
+          "C# / ASP.NET Core",
+          "Microservices",
+          "Hibernate",
+          "Keycloak"
+        ]
+      },
+      {
+        "title": "Bases de données & DevOps",
+        "icon": "fas fa-tools",
+        "items": [
+          "Oracle",
+          "PostgreSQL",
+          "Docker & Kubernetes",
+          "GitLab CI/CD",
+          "MongoDB",
+          "Firebase"
+        ]
+      },
+      {
+        "title": "IA & automatisation",
+        "icon": "fas fa-robot",
+        "items": [
+          "GitHub Copilot",
+          "Prompt Engineering",
+          "RAG",
+          "Ollama",
+          "LLMs",
+          "Claude CLI"
+        ]
+      }
+    ]
+  },
+  "projects": {
+    "title": "Travaux sélectionnés",
+    "featured": [
+      {
+        "title": "Services nationaux de scoring TPE/PME",
+        "type": "Projet phare",
+        "description": "Conception et développement des services nationaux de scoring des TPE/PME à Bank Al-Maghrib. Modélisation des spécifications métier et des workflows avec Vizor Builder.",
+        "tech": [
+          "Java",
+          "Spring Boot",
+          "Oracle",
+          "Microservices"
+        ],
+        "github": "#",
+        "live": "#",
+        "image": "https://placehold.co/800x500/121B1F/93A3A0?text=Scoring+Services",
+        "reverse": false
+      },
+      {
+        "title": "Plateforme d'engagement client",
+        "type": "Projet phare",
+        "description": "Intégration et optimisation d'une plateforme d'engagement client chez Sopra Banking Software. Migration de l'architecture vers des microservices et intégration d'un module de gestion des produits.",
+        "tech": [
+          "React",
+          "TypeScript",
+          "Spring Boot",
+          "Keycloak"
+        ],
+        "github": "#",
+        "live": "#",
+        "image": "https://placehold.co/800x500/121B1F/93A3A0?text=Customer+Engagement",
+        "reverse": true
+      }
+    ],
+    "otherTitle": "Autres projets notables",
+    "other": [
+      {
+        "title": "Plateforme agritech",
+        "description": "Développement d'une plateforme agritech responsive, avec un backend robuste et une interface moderne, chez Twins Gestion du terroir.",
+        "tech": [
+          "Spring Boot",
+          "Angular",
+          "PostgreSQL"
+        ],
+        "github": "#",
+        "live": ""
+      },
+      {
+        "title": "Plateforme CMS automatisée",
+        "description": "Développement d'un site CMS aux workflows de contenu automatisés lors de mon stage de développeur web chez DevBay.",
+        "tech": [
+          "PHP",
+          "Laravel",
+          "Bootstrap"
+        ],
+        "github": "#",
+        "live": "#"
+      },
+      {
+        "title": "Refonte d'un système de gestion des produits",
+        "description": "Modernisation de l'architecture en microservices et traduction des besoins métier en user stories pour un logiciel bancaire.",
+        "tech": [
+          "Spring Boot",
+          "React",
+          "PostgreSQL"
+        ],
+        "github": "#",
+        "live": ""
+      }
+    ]
+  },
+  "contact": {
+    "step": "reach_out()",
+    "preTitle": "Et maintenant ?",
+    "title": "Me contacter",
+    "description": "Que vous ayez une question sur mon expérience dans les systèmes bancaires et d'entreprise, ou simplement envie d'échanger, ma boîte mail est toujours ouverte. Je ferai de mon mieux pour vous répondre.",
+    "buttonText": "Dire bonjour"
+  },
+  "ui": {
+    "languageName": "Français",
+    "skipToContent": "Aller au contenu",
+    "nav": {
+      "about": "à propos",
+      "skills": "compétences",
+      "projects": "projets",
+      "contact": "contact",
+      "resume": "cv",
+      "resumeHeading": "CV",
+      "resumeEn": "English (PDF)",
+      "resumeFr": "Français (PDF)",
+      "toggleMenu": "Ouvrir le menu",
+      "dayMode": "Passer en mode jour",
+      "nightMode": "Passer en mode nuit",
+      "language": "Langue",
+      "sectionProgress": "Progression des sections",
+      "jumpTo": "Aller à",
+      "dayToast": "Mode jour",
+      "nightToast": "Mode nuit"
+    },
+    "hero": {
+      "github": "github"
+    },
+    "about": {
+      "notes": "// profile.notes<br>statut : curieux, caféiné"
+    },
+    "skills": {
+      "heading": "stack"
+    },
+    "projects": {
+      "filterLabel": "Filtrer les projets par technologie",
+      "all": "tous",
+      "noResults": "// aucun projet ne correspond à ce filtre",
+      "repo": "dépôt GitHub",
+      "demo": "démo en ligne",
+      "screenshot": "capture d'écran"
+    },
+    "contact": {
+      "copyEmail": "copier l'email",
+      "copied": "copié !",
+      "copiedToast": "Email copié dans le presse-papiers"
+    },
+    "footer": {
+      "builtBy": "conçu et développé par",
+      "backToTop": "Retour en haut"
+    },
+    "terminal": {
+      "lastLogin": "Dernière connexion : {date} sur ttys001",
+      "intro": "tapez {help} pour lister les commandes, ou essayez {about}",
+      "placeholder": "tapez une commande…",
+      "inputLabel": "Commande du terminal",
+      "helpAbout": "à propos de moi :",
+      "helpShell": "shell :",
+      "builtins": {
+        "help": "lister les commandes disponibles",
+        "clear": "effacer le terminal",
+        "reset": "fermer le shell, réafficher la const",
+        "ls": "lister les fichiers de commandes",
+        "history": "afficher les commandes précédentes",
+        "lang": "changer de langue : lang en | fr | ar"
+      },
+      "notFound": "commande introuvable :",
+      "tryHelp": "— tapez",
+      "loadError": "impossible de charger",
+      "restored": "// const restaurée — commencez à taper pour rouvrir le shell",
+      "sudo": "bien essayé.",
+      "sudoTail": "cet incident sera signalé.",
+      "langUsage": "usage : lang en | fr | ar",
+      "langSwitching": "changement de langue…"
+    }
+  }
+}

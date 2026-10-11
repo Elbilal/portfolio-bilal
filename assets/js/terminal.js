@@ -9,15 +9,29 @@
  */
 
 const Terminal = (() => {
-  const DIR = 'terminal/';
   const META_KEYS = new Set(['var', 'aliases']);
-  const BUILTINS = {
-    help: 'list available commands',
-    clear: 'clear the terminal',
-    reset: 'close the shell, bring back the const',
-    ls: 'list command files',
-    history: 'show previous commands',
+  // English fallbacks; mount() merges in the locale's ui.terminal strings.
+  const DEFAULT_STRINGS = {
+    lastLogin: 'Last login: {date} on ttys001',
+    intro: 'type {help} to list commands, or try {about}',
+    helpAbout: 'about me:', helpShell: 'shell:',
+    builtins: {
+      help: 'list available commands',
+      clear: 'clear the terminal',
+      reset: 'close the shell, bring back the const',
+      ls: 'list command files',
+      history: 'show previous commands',
+      lang: 'switch language: lang en | fr | ar',
+    },
+    notFound: 'command not found:', tryHelp: '— type',
+    loadError: "couldn't load", restored: '// const restored — start typing to open the shell again',
+    sudo: 'nice try.', sudoTail: 'this incident will be reported.',
+    langUsage: 'usage: lang en | fr | ar', langSwitching: 'switching language…',
   };
+  let S = DEFAULT_STRINGS;
+  let DIR = 'terminal/en/';
+  let LANG = 'en';
+  let LANGS = ['en'];
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -215,6 +229,7 @@ const Terminal = (() => {
   function print(html, cls = '') {
     const div = document.createElement('div');
     div.className = `term-out ${cls}`;
+    div.dir = 'auto';
     div.innerHTML = html;
     els.log.appendChild(div);
     scrollToPrompt();
@@ -231,8 +246,8 @@ const Terminal = (() => {
   async function helpText() {
     const reg = await loadRegistry();
     const row = (name, desc) => `<li><span class="term-cmd" data-cmd="${esc(name)}">${esc(name)}</span><span class="text-muted">${esc(desc)}</span></li>`;
-    return `<p class="text-muted">about me:</p><ul class="term-help">${reg.map((c) => row(c.name, c.description)).join('')}</ul>`
-      + `<p class="text-muted">shell:</p><ul class="term-help">${Object.entries(BUILTINS).map(([n, d]) => row(n, d)).join('')}</ul>`;
+    return `<p class="text-muted">${esc(S.helpAbout)}</p><ul class="term-help">${reg.map((c) => row(c.name, c.description)).join('')}</ul>`
+      + `<p class="text-muted">${esc(S.helpShell)}</p><ul class="term-help">${Object.entries(S.builtins).map(([n, d]) => row(n, d)).join('')}</ul>`;
   }
 
   async function resolve(name) {
@@ -261,7 +276,7 @@ const Terminal = (() => {
         case 'clear': case 'cls': els.log.innerHTML = ''; return;
         case 'reset': case 'exit': case 'engineer':
           exitShell();
-          print('<span class="text-muted">// const restored — start typing to open the shell again</span>');
+          print(`<span class="text-muted">${esc(S.restored)}</span>`);
           return;
         case 'ls': {
           const reg = await loadRegistry();
@@ -272,13 +287,26 @@ const Terminal = (() => {
           print(history.map((h, i) => `<span class="text-muted">${String(i + 1).padStart(3)}</span>  ${esc(h)}`).join('<br>'));
           return;
         case 'sudo':
-          print('<span class="text-danger">nice try.</span> <span class="text-muted">this incident will be reported.</span>');
+          print(`<span class="text-danger">${esc(S.sudo)}</span> <span class="text-muted">${esc(S.sudoTail)}</span>`);
           return;
+        case 'lang': {
+          const next = (args[0] || '').toLowerCase();
+          if (!LANGS.includes(next)) {
+            print(`<span class="text-muted">${esc(S.langUsage)}</span>`);
+            return;
+          }
+          if (next === LANG) return;
+          print(`<span class="text-muted">${esc(S.langSwitching)}</span>`);
+          const url = new URL(location.href);
+          url.searchParams.set('lang', next);
+          location.assign(url);
+          return;
+        }
       }
 
       const name = await resolve(cmd);
       if (!name) {
-        print(`<span class="text-danger">command not found:</span> ${esc(cmd)} <span class="text-muted">— type</span> <span class="term-cmd" data-cmd="help">help</span>`);
+        print(`<span class="text-danger">${esc(S.notFound)}</span> ${esc(cmd)} <span class="text-muted">${esc(S.tryHelp)}</span> <span class="term-cmd" data-cmd="help">help</span>`);
         return;
       }
       const doc = await loadCommand(name);
@@ -288,7 +316,7 @@ const Terminal = (() => {
       if (doc.body) print(renderMarkdown(doc.body), 'term-md');
     } catch (err) {
       console.error(err);
-      print(`<span class="text-danger">error:</span> couldn't load terminal/${esc(cmd)}.md <span class="text-muted">(${esc(err.message)})</span>`);
+      print(`<span class="text-danger">error:</span> ${esc(S.loadError)} ${esc(DIR + cmd)}.md <span class="text-muted">(${esc(err.message)})</span>`);
     }
   }
 
@@ -296,7 +324,7 @@ const Terminal = (() => {
     const value = els.input.value.trim().toLowerCase();
     if (!value) return;
     const reg = await loadRegistry();
-    const names = [...reg.map((c) => c.name), ...Object.keys(BUILTINS)];
+    const names = [...reg.map((c) => c.name), ...Object.keys(S.builtins)];
     const matches = names.filter((n) => n.startsWith(value));
     if (matches.length === 1) { els.input.value = matches[0]; syncMirror(); }
     else if (matches.length > 1) { echo(els.input.value); print(matches.map(esc).join('  '), 'text-muted'); }
@@ -311,13 +339,17 @@ const Terminal = (() => {
     const under = v[pos] ?? ' ';
     els.mirror.classList.toggle('is-focused', focused);
     els.mirror.innerHTML = !v && !focused
-      ? `<span class="term-placeholder">${esc(els.input.placeholder)}</span>`
+      ? `<span class="term-placeholder" dir="auto">${esc(els.input.placeholder)}</span>`
       : `${esc(v.slice(0, pos))}<span class="term-cursor">${esc(under)}</span>${esc(v.slice(pos + 1))}`;
   }
 
   /* ---------------- wiring ---------------- */
 
-  function mount(root, { varName, fields, prompt = 'guest@bilal:~$' }) {
+  function mount(root, { varName, fields, prompt = 'guest@bilal:~$', lang = 'en', strings = {}, languages = ['en'] }) {
+    LANG = lang;
+    LANGS = languages;
+    DIR = `terminal/${lang}/`;
+    S = { ...DEFAULT_STRINGS, ...strings, builtins: { ...DEFAULT_STRINGS.builtins, ...strings.builtins } };
     els = {
       root,
       code: root.querySelector('[data-term-const]'),
@@ -331,9 +363,15 @@ const Terminal = (() => {
     initial = { var: varName, fields };
     els.code.innerHTML = segmentsToHTML(constSegments(varName, fields));
 
-    const login = new Date().toString().split(' GMT')[0];
-    print(`<span class="text-muted">Last login: ${esc(login)} on ttys001</span>`);
-    print(`<span class="text-muted">type</span> <span class="term-cmd" data-cmd="help">help</span> <span class="text-muted">to list commands, or try</span> <span class="term-cmd" data-cmd="about">about</span>`);
+    // Arabic locale formats embed direction marks that scramble the line, so
+    // Arabic gets a plain ISO-style timestamp.
+    const now = new Date();
+    const login = lang === 'ar'
+      ? `${now.toLocaleDateString('sv-SE')} ${now.toLocaleTimeString('sv-SE')}`
+      : now.toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'medium' });
+    print(`<span class="text-muted">${esc(S.lastLogin).replace('{date}', `<bdi dir="ltr">${esc(login)}</bdi>`)}</span>`);
+    const link = (name) => `<span class="term-cmd" data-cmd="${name}">${name}</span>`;
+    print(`<span class="text-muted">${esc(S.intro).replace('{help}', link('help')).replace('{about}', link('about'))}</span>`);
 
     // Typing anything wipes the const; deleting back to nothing restores it.
     els.input.addEventListener('input', () => {

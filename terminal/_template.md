@@ -9,7 +9,7 @@ tags:
 ---
 ## my command
 
-Copy this file to `terminal/<command>.md`, then add a line to
-`terminal/index.md`:
+Copy this file to `terminal/<lang>/<command>.md` for each language
+(en, fr, ar), then add a line to each `terminal/<lang>/index.md`:
 
 - <command> — short description shown by `help`

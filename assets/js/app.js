@@ -2,9 +2,18 @@
 
 /**
  * Portfolio app
- * Content lives entirely in /data.json. Edit that file to change the site —
- * no HTML/JS changes needed for text, links, projects, or skills.
+ * Content lives entirely in /locales/<lang>.json (en, fr, ar). Edit those files
+ * to change the site — no HTML/JS changes needed for text, links, projects,
+ * skills or interface labels.
  */
+
+// Set by the inline script in <head> (?lang=, saved choice, browser, then en).
+const LANG = document.documentElement.lang || 'en';
+const LANGUAGES = [
+  { code: 'en', label: 'EN', name: 'English' },
+  { code: 'fr', label: 'FR', name: 'Français' },
+  { code: 'ar', label: 'ع', name: 'العربية' },
+];
 
 let portfolioData = null;
 let activeFilter = 'all';
@@ -17,13 +26,15 @@ const badgeColorThemes = [
 const getBadgeColor = (i) => badgeColorThemes[i % badgeColorThemes.length];
 
 const $ = (id) => document.getElementById(id);
+// Interface strings from the locale's "ui" block, e.g. t('nav.about').
+const t = (path) => path.split('.').reduce((o, k) => o?.[k], portfolioData?.ui) ?? path;
 const escapeHTML = (str) =>
   String(str ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 
 /* ---------------------------------------------------------------------- */
-/* Data loading — external data.json, with timeout + one retry            */
+/* Data loading — locales/<lang>.json, with timeout + one retry          */
 /* ---------------------------------------------------------------------- */
 
 async function fetchWithTimeout(url, { timeout = 8000, ...opts } = {}) {
@@ -40,7 +51,7 @@ async function fetchWithTimeout(url, { timeout = 8000, ...opts } = {}) {
 
 async function loadPortfolioData(retry = true) {
   try {
-    return await fetchWithTimeout('data.json');
+    return await fetchWithTimeout(`locales/${LANG}.json`);
   } catch (err) {
     if (retry) {
       await new Promise((r) => setTimeout(r, 600));
@@ -55,21 +66,27 @@ function renderSkeleton() {
   requestAnimationFrame(() => document.body.classList.remove('opacity-0'));
 }
 
+const ERROR_TEXT = {
+  en: { title: "Couldn't load this page", body: "The content file didn't respond in time. If you're viewing this file directly (file://), serve it over HTTP instead — e.g.", retry: 'Retry' },
+  fr: { title: 'Impossible de charger la page', body: "Le fichier de contenu n'a pas répondu à temps. Si vous ouvrez ce fichier directement (file://), servez-le plutôt en HTTP — par exemple", retry: 'Réessayer' },
+  ar: { title: 'تعذّر تحميل الصفحة', body: 'لم يستجب ملف المحتوى في الوقت المناسب. إذا كنت تفتح هذا الملف مباشرة (file://)، فقدّمه عبر HTTP بدلًا من ذلك — مثلًا', retry: 'إعادة المحاولة' },
+};
+
 function renderErrorState(err) {
   console.error('Error loading portfolio data:', err);
+  const text = ERROR_TEXT[LANG] || ERROR_TEXT.en;
   const root = document.getElementById('main');
   if (!root) return;
   root.innerHTML = `
     <div class="max-w-lg mx-auto px-6 py-32 text-center">
       <div class="error-banner p-8">
-        <p class="font-mono text-sm text-danger mb-3">// fetch(data.json) failed</p>
-        <h1 class="text-xl font-display font-semibold text-text mb-3">Couldn't load this page</h1>
+        <p class="font-mono text-sm text-danger mb-3" dir="ltr">// fetch(locales/${LANG}.json) failed</p>
+        <h1 class="text-xl font-display font-semibold text-text mb-3">${text.title}</h1>
         <p class="text-muted text-sm mb-6 leading-relaxed">
-          The content file didn't respond in time. If you're viewing this file directly
-          (file://), serve it over HTTP instead — e.g. <code class="font-mono text-teal">npx serve</code>.
+          ${text.body} <code class="font-mono text-teal">npx serve</code>.
         </p>
         <button id="retry-btn" type="button" class="bg-amber hover:bg-amber/90 text-[#171208] font-mono text-sm font-medium py-2.5 px-6 rounded-lg transition-colors">
-          Retry
+          ${text.retry}
         </button>
       </div>
     </div>
@@ -96,6 +113,10 @@ function renderMeta() {
   setMeta('meta[property="og:image"]', 'content', seo?.ogImage);
   setMeta('meta[name="theme-color"]', 'content', seo?.themeColor);
   setMeta('link[rel="canonical"]', 'href', seo?.canonical);
+  setMeta('meta[property="og:locale"]', 'content', portfolioData.meta.locale);
+  const skip = $('skip-link');
+  if (skip) skip.textContent = t('skipToContent');
+  $('rail')?.setAttribute('aria-label', t('nav.sectionProgress'));
 
   // JSON-LD structured data, built from the loaded data (kept out of source HTML
   // so it always matches what's actually on the page).
@@ -107,6 +128,7 @@ function renderMeta() {
     email: portfolioData.meta.email,
     url: seo?.canonical,
     sameAs: Object.values(portfolioData.meta.socials || {}),
+    inLanguage: LANG,
   };
   let script = document.getElementById('ld-json');
   if (!script) {
@@ -118,47 +140,59 @@ function renderMeta() {
   script.textContent = JSON.stringify(ld);
 }
 
+// Plain links (?lang=xx) so switching works without JS state and is crawlable.
+function languageLinks(className) {
+  return LANGUAGES.map((l) => {
+    const current = l.code === LANG;
+    return `<a href="?lang=${l.code}" hreflang="${l.code}" lang="${l.code}" class="${className}${current ? ' is-current' : ''}"
+      title="${l.name}" ${current ? 'aria-current="true"' : ''}>${l.label}</a>`;
+  }).join('');
+}
+
 function renderNavigation() {
+  const n = portfolioData.ui.nav;
   const navHTML = `
     <nav class="fixed w-full bg-ink/85 backdrop-blur-sm z-50 border-b border-hair" id="site-nav">
       <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-20">
         <div class="flex justify-between items-center h-16">
-          <a href="#hero" class="font-display font-semibold text-lg tracking-tight text-text">
+          <a href="#hero" class="font-display font-semibold text-lg tracking-tight text-text" dir="ltr">
             <span class="text-amber font-mono">&lt;</span>${escapeHTML(portfolioData.meta.logoName)}<span class="text-amber font-mono">/&gt;</span>
           </a>
 
           <div class="hidden md:flex items-center gap-8">
-            <a href="#about" data-nav="about" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">about</a>
-            <a href="#skills" data-nav="skills" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">skills</a>
-            <a href="#projects" data-nav="projects" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">projects</a>
-            <a href="#contact" data-nav="contact" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">contact</a>
+            <a href="#about" data-nav="about" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">${escapeHTML(n.about)}</a>
+            <a href="#skills" data-nav="skills" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">${escapeHTML(n.skills)}</a>
+            <a href="#projects" data-nav="projects" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">${escapeHTML(n.projects)}</a>
+            <a href="#contact" data-nav="contact" class="nav-link text-sm font-mono text-muted hover:text-text transition-colors">${escapeHTML(n.contact)}</a>
 
             <div class="relative group">
               <button class="border border-amber/50 text-amber hover:bg-amber hover:text-[#171208] px-4 py-1.5 rounded-md text-sm font-mono transition-all flex items-center gap-2" aria-haspopup="true" aria-expanded="false" id="resume-btn">
-                resume <i class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-hover:rotate-180" aria-hidden="true"></i>
+                ${escapeHTML(n.resume)} <i class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-hover:rotate-180" aria-hidden="true"></i>
               </button>
-              <div class="absolute right-0 mt-2 w-44 bg-surface border border-hair rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50" role="menu">
+              <div class="absolute end-0 mt-2 w-44 bg-surface border border-hair rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50" role="menu">
                 <a href="${portfolioData.meta.resume.en}" class="block px-4 py-2 text-sm text-text hover:text-amber hover:bg-surface2 rounded-t-md border-b border-hair transition-colors" role="menuitem">
-                  <i class="fas fa-file-pdf text-amber/70 mr-2" aria-hidden="true"></i>English (PDF)
+                  <i class="fas fa-file-pdf text-amber/70 me-2" aria-hidden="true"></i>${escapeHTML(n.resumeEn)}
                 </a>
                 <a href="${portfolioData.meta.resume.fr}" class="block px-4 py-2 text-sm text-text hover:text-amber hover:bg-surface2 rounded-b-md transition-colors" role="menuitem">
-                  <i class="fas fa-file-pdf text-amber/70 mr-2" aria-hidden="true"></i>Français (PDF)
+                  <i class="fas fa-file-pdf text-amber/70 me-2" aria-hidden="true"></i>${escapeHTML(n.resumeFr)}
                 </a>
               </div>
             </div>
 
-            <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Switch to day mode" aria-pressed="false">
+            <div class="lang-switch" role="group" aria-label="${escapeHTML(n.language)}">${languageLinks('lang-option')}</div>
+
+            <button id="theme-toggle" type="button" class="theme-toggle" aria-label="${escapeHTML(n.dayMode)}" aria-pressed="false">
               <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
               <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
             </button>
           </div>
 
           <div class="md:hidden flex items-center gap-3">
-            <button id="theme-toggle-mobile" type="button" class="theme-toggle" aria-label="Switch to day mode" aria-pressed="false">
+            <button id="theme-toggle-mobile" type="button" class="theme-toggle" aria-label="${escapeHTML(n.dayMode)}" aria-pressed="false">
               <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
               <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
             </button>
-            <button id="mobile-menu-btn" class="text-text focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
+            <button id="mobile-menu-btn" class="text-text focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="${escapeHTML(n.toggleMenu)}">
               <i class="fas fa-bars text-xl" aria-hidden="true"></i>
             </button>
           </div>
@@ -167,14 +201,18 @@ function renderNavigation() {
 
       <div id="mobile-menu" class="hidden md:hidden bg-ink border-t border-hair">
         <div class="px-4 pt-2 pb-4 space-y-1 font-mono text-sm">
-          <a href="#about" class="block px-2 py-2.5 text-muted hover:text-amber">about</a>
-          <a href="#skills" class="block px-2 py-2.5 text-muted hover:text-amber">skills</a>
-          <a href="#projects" class="block px-2 py-2.5 text-muted hover:text-amber">projects</a>
-          <a href="#contact" class="block px-2 py-2.5 text-muted hover:text-amber">contact</a>
+          <a href="#about" class="block px-2 py-2.5 text-muted hover:text-amber">${escapeHTML(n.about)}</a>
+          <a href="#skills" class="block px-2 py-2.5 text-muted hover:text-amber">${escapeHTML(n.skills)}</a>
+          <a href="#projects" class="block px-2 py-2.5 text-muted hover:text-amber">${escapeHTML(n.projects)}</a>
+          <a href="#contact" class="block px-2 py-2.5 text-muted hover:text-amber">${escapeHTML(n.contact)}</a>
           <div class="border-t border-hair mt-2 pt-3">
-            <p class="px-2 pb-2 text-xs text-muted/70 uppercase tracking-wider">Résumé</p>
-            <a href="${portfolioData.meta.resume.en}" class="block px-2 py-2 text-text hover:text-amber"><i class="fas fa-file-pdf text-amber/70 mr-2" aria-hidden="true"></i>English</a>
-            <a href="${portfolioData.meta.resume.fr}" class="block px-2 py-2 text-text hover:text-amber"><i class="fas fa-file-pdf text-amber/70 mr-2" aria-hidden="true"></i>Français</a>
+            <p class="px-2 pb-2 text-xs text-muted/70 uppercase tracking-wider">${escapeHTML(n.resumeHeading)}</p>
+            <a href="${portfolioData.meta.resume.en}" class="block px-2 py-2 text-text hover:text-amber"><i class="fas fa-file-pdf text-amber/70 me-2" aria-hidden="true"></i>${escapeHTML(n.resumeEn)}</a>
+            <a href="${portfolioData.meta.resume.fr}" class="block px-2 py-2 text-text hover:text-amber"><i class="fas fa-file-pdf text-amber/70 me-2" aria-hidden="true"></i>${escapeHTML(n.resumeFr)}</a>
+          </div>
+          <div class="border-t border-hair mt-2 pt-3 px-2">
+            <p class="pb-2 text-xs text-muted/70 uppercase tracking-wider">${escapeHTML(n.language)}</p>
+            <div class="lang-switch" role="group" aria-label="${escapeHTML(n.language)}">${languageLinks('lang-option')}</div>
           </div>
         </div>
       </div>
@@ -191,7 +229,7 @@ function renderRail() {
     { id: 'contact', tag: 'CTC' },
   ];
   const nodes = items.map((it) => `
-    <a href="#${it.id}" class="rail-node" data-rail="${it.id}" aria-label="Jump to ${it.id}">
+    <a href="#${it.id}" class="rail-node" data-rail="${it.id}" aria-label="${escapeHTML(t('nav.jumpTo'))} ${escapeHTML(t(`nav.${it.id}`))}">
       <span class="rail-tag">${it.tag}</span>
     </a>
   `).join('');
@@ -203,22 +241,22 @@ function renderHero() {
 
   $('hero').innerHTML = `
     <div class="order-2 md:order-1 reveal">
-      <p class="text-amber font-mono mb-4 text-sm">${escapeHTML(greeting)}</p>
+      <p class="text-amber font-mono mb-4 text-sm"><bdi dir="ltr">${escapeHTML(greeting)}</bdi></p>
       <h1 class="text-4xl md:text-6xl font-display font-bold text-text mb-3 tracking-tight leading-[1.05]">${escapeHTML(portfolioData.meta.name)}</h1>
       <h2 class="text-xl md:text-2xl font-mono text-muted mb-6">${escapeHTML(headline)}</h2>
       <p class="text-muted text-base md:text-lg mb-8 max-w-md leading-relaxed">${escapeHTML(description)}</p>
       <div class="flex flex-wrap gap-4">
         <a href="#projects" class="bg-amber hover:bg-amber/90 text-[#171208] font-mono font-medium py-3 px-6 rounded-lg transition-colors text-center text-sm">
-          ${escapeHTML(ctaText)} →
+          ${escapeHTML(ctaText)} <span class="flip-rtl" aria-hidden="true">→</span>
         </a>
         <a href="${portfolioData.meta.socials.github}" target="_blank" rel="noopener noreferrer" class="border border-hair hover:border-amber/50 text-text font-mono py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
-          <i class="fab fa-github" aria-hidden="true"></i> github
+          <i class="fab fa-github" aria-hidden="true"></i> ${escapeHTML(t('hero.github'))}
         </a>
       </div>
     </div>
 
     <div class="order-1 md:order-2 reveal">
-      <div class="code-window schematic overflow-hidden max-w-md mx-auto" id="hero-terminal">
+      <div class="code-window schematic overflow-hidden max-w-md mx-auto" id="hero-terminal" dir="ltr">
         <div class="flex items-center gap-2 px-4 py-3 border-b border-hair">
           <span class="code-dot bg-[#5a4230]"></span>
           <span class="code-dot bg-[#5a5230]"></span>
@@ -236,7 +274,7 @@ function renderHero() {
             <span class="text-teal shrink-0">guest@bilal:~$</span>
             <span class="term-field">
               <span class="term-mirror" data-term-mirror aria-hidden="true"></span>
-              <input type="text" data-term-input class="term-input" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" enterkeyhint="send" aria-label="Terminal command" placeholder="type a command…">
+              <input type="text" data-term-input class="term-input" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" enterkeyhint="send" dir="auto" aria-label="${escapeHTML(t('terminal.inputLabel'))}" placeholder="${escapeHTML(t('terminal.placeholder'))}">
             </span>
           </label>
         </div>
@@ -249,6 +287,9 @@ function renderHero() {
   `;
 
   Terminal.mount($('hero-terminal'), {
+    lang: LANG,
+    strings: portfolioData.ui.terminal,
+    languages: LANGUAGES.map((l) => l.code),
     varName: 'engineer',
     fields: {
       name: portfolioData.meta.name,
@@ -264,15 +305,15 @@ function renderAbout() {
   const paragraphs = about.paragraphs.map((p) => `<p>${escapeHTML(p)}</p>`).join('');
   const stats = (about.stats || []).map((s) => `
     <div class="text-center">
-      <p class="font-display text-2xl md:text-3xl font-bold text-amber">${escapeHTML(s.value)}</p>
+      <p class="font-display text-2xl md:text-3xl font-bold text-amber"><bdi dir="ltr">${escapeHTML(s.value)}</bdi></p>
       <p class="font-mono text-[11px] text-muted uppercase tracking-wide mt-1">${escapeHTML(s.label)}</p>
     </div>
   `).join('');
 
   $('about-container').innerHTML = `
     <h2 class="text-2xl md:text-3xl font-display font-semibold text-text mb-10 flex items-center reveal">
-      <span class="text-amber font-mono text-base mr-3">// ${escapeHTML(about.title.toLowerCase())}</span>
-      <div class="ml-4 h-px bg-hair flex-grow"></div>
+      <span class="text-amber font-mono text-base me-3">// ${escapeHTML(about.title.toLowerCase())}</span>
+      <div class="ms-4 h-px bg-hair flex-grow"></div>
     </h2>
     <div class="flex flex-col md:flex-row gap-10">
       <div class="md:w-2/3 text-muted space-y-4 leading-relaxed text-base md:text-lg reveal">
@@ -282,7 +323,7 @@ function renderAbout() {
       <div class="md:w-1/3 reveal">
         <div class="schematic rounded-lg bg-surface p-6 border border-hair h-full flex flex-col items-center justify-center text-center gap-3">
           <i class="${about.icon} text-4xl text-amber" aria-hidden="true"></i>
-          <p class="font-mono text-xs text-muted">// profile.notes<br>status: curious, caffeinated</p>
+          <p class="font-mono text-xs text-muted" dir="auto">${t('about.notes')}</p>
         </div>
       </div>
     </div>
@@ -307,8 +348,8 @@ function renderSkills() {
 
   $('skills-container').innerHTML = `
     <h2 class="text-2xl md:text-3xl font-display font-semibold text-text mb-12 flex items-center reveal">
-      <span class="text-amber font-mono text-base mr-3">// stack</span>
-      <div class="ml-4 h-px bg-hair flex-grow"></div>
+      <span class="text-amber font-mono text-base me-3">// ${escapeHTML(t('skills.heading'))}</span>
+      <div class="ms-4 h-px bg-hair flex-grow"></div>
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">${categories}</div>
   `;
@@ -324,18 +365,18 @@ function allTechTags() {
 function renderProjects() {
   const featuredHTML = portfolioData.projects.featured.map((project) => {
     const layoutDirection = project.reverse ? 'lg:flex-row-reverse' : 'lg:flex-row';
-    const textAlignment = project.reverse ? 'lg:items-start text-left' : 'lg:items-end text-left lg:text-right';
+    const textAlignment = project.reverse ? 'lg:items-start text-start' : 'lg:items-end text-start lg:text-end';
     const techListAlignment = project.reverse ? 'justify-start' : 'lg:justify-end';
     const techList = project.tech.map((t) => `<li class="text-teal">${escapeHTML(t)}</li>`).join('');
 
     const links = [];
-    if (project.github) links.push(`<a href="${project.github}" class="text-muted hover:text-amber transition-colors" aria-label="${escapeHTML(project.title)} GitHub repo"><i class="fab fa-github text-xl" aria-hidden="true"></i></a>`);
-    if (project.live) links.push(`<a href="${project.live}" class="text-muted hover:text-amber transition-colors" aria-label="${escapeHTML(project.title)} live demo"><i class="fas fa-external-link-alt text-xl" aria-hidden="true"></i></a>`);
+    if (project.github) links.push(`<a href="${project.github}" class="text-muted hover:text-amber transition-colors" aria-label="${escapeHTML(project.title)} — ${escapeHTML(t('projects.repo'))}"><i class="fab fa-github text-xl" aria-hidden="true"></i></a>`);
+    if (project.live) links.push(`<a href="${project.live}" class="text-muted hover:text-amber transition-colors" aria-label="${escapeHTML(project.title)} — ${escapeHTML(t('projects.demo'))}"><i class="fas fa-external-link-alt text-xl flip-rtl" aria-hidden="true"></i></a>`);
 
     return `
       <div class="reveal flex flex-col ${layoutDirection} items-center gap-8" data-tech="${project.tech.map(escapeHTML).join('|')}">
         <div class="lg:w-7/12 schematic w-full rounded-xl overflow-hidden border border-hair">
-          <img src="${project.image}" alt="${escapeHTML(project.title)} screenshot" loading="lazy" decoding="async" width="800" height="500" class="w-full h-auto object-cover">
+          <img src="${project.image}" alt="${escapeHTML(project.title)} — ${escapeHTML(t('projects.screenshot'))}" loading="lazy" decoding="async" width="800" height="500" class="w-full h-auto object-cover">
         </div>
         <div class="lg:w-5/12 z-10 flex flex-col ${textAlignment}">
           <p class="text-amber font-mono text-xs mb-2 tracking-wide uppercase">${escapeHTML(project.type)}</p>
@@ -353,8 +394,8 @@ function renderProjects() {
   const otherHTML = portfolioData.projects.other.map((project) => {
     const techList = project.tech.map((t) => `<li>${escapeHTML(t)}</li>`).join('');
     const links = [];
-    if (project.github) links.push(`<a href="${project.github}" class="text-muted hover:text-amber" aria-label="${escapeHTML(project.title)} GitHub repo"><i class="fab fa-github text-lg" aria-hidden="true"></i></a>`);
-    if (project.live) links.push(`<a href="${project.live}" class="text-muted hover:text-amber" aria-label="${escapeHTML(project.title)} live demo"><i class="fas fa-external-link-alt text-lg" aria-hidden="true"></i></a>`);
+    if (project.github) links.push(`<a href="${project.github}" class="text-muted hover:text-amber" aria-label="${escapeHTML(project.title)} — ${escapeHTML(t('projects.repo'))}"><i class="fab fa-github text-lg" aria-hidden="true"></i></a>`);
+    if (project.live) links.push(`<a href="${project.live}" class="text-muted hover:text-amber" aria-label="${escapeHTML(project.title)} — ${escapeHTML(t('projects.demo'))}"><i class="fas fa-external-link-alt text-lg flip-rtl" aria-hidden="true"></i></a>`);
 
     return `
       <div class="reveal project-card bg-surface p-6 rounded-xl border border-hair hover:border-amber/40 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" data-tech="${project.tech.map(escapeHTML).join('|')}">
@@ -371,16 +412,16 @@ function renderProjects() {
 
   const tags = allTechTags();
   const filterHTML = tags.length ? `
-    <div class="flex flex-wrap gap-2 mb-10 reveal" role="group" aria-label="Filter projects by technology" id="project-filters">
-      <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">all</button>
+    <div class="flex flex-wrap gap-2 mb-10 reveal" role="group" aria-label="${escapeHTML(t('projects.filterLabel'))}" id="project-filters">
+      <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">${escapeHTML(t('projects.all'))}</button>
       ${tags.map((t) => `<button type="button" class="filter-chip" data-filter="${escapeHTML(t)}" aria-pressed="false">${escapeHTML(t)}</button>`).join('')}
     </div>
   ` : '';
 
   $('projects-container').innerHTML = `
     <h2 class="text-2xl md:text-3xl font-display font-semibold text-text mb-8 flex items-center reveal">
-      <span class="text-amber font-mono text-base mr-3">// ${escapeHTML(portfolioData.projects.title.toLowerCase())}</span>
-      <div class="ml-4 h-px bg-hair flex-grow"></div>
+      <span class="text-amber font-mono text-base me-3">// ${escapeHTML(portfolioData.projects.title.toLowerCase())}</span>
+      <div class="ms-4 h-px bg-hair flex-grow"></div>
     </h2>
     ${filterHTML}
     <div class="space-y-24" id="featured-projects">${featuredHTML}</div>
@@ -388,7 +429,7 @@ function renderProjects() {
       <h3 class="text-xl font-display font-semibold text-text mb-8 text-center reveal">${escapeHTML(portfolioData.projects.otherTitle)}</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="other-projects">${otherHTML}</div>
     </div>
-    <p id="no-results" class="hidden text-center text-muted font-mono text-sm mt-10">// no projects match this filter</p>
+    <p id="no-results" class="hidden text-center text-muted font-mono text-sm mt-10">${escapeHTML(t('projects.noResults'))}</p>
   `;
 
   initProjectFilters();
@@ -420,7 +461,7 @@ function initProjectFilters() {
 function renderContact() {
   const c = portfolioData.contact;
   $('contact-container').innerHTML = `
-    <p class="text-amber font-mono mb-4 text-sm reveal">${escapeHTML(c.step)} <span class="text-muted">// ${escapeHTML(c.preTitle.toLowerCase())}</span></p>
+    <p class="text-amber font-mono mb-4 text-sm reveal"><bdi dir="ltr">${escapeHTML(c.step)}</bdi> <span class="text-muted">// ${escapeHTML(c.preTitle.toLowerCase())}</span></p>
     <h2 class="text-3xl md:text-4xl font-display font-bold text-text mb-6 reveal">${escapeHTML(c.title)}</h2>
     <p class="text-muted text-base md:text-lg mb-10 leading-relaxed reveal">${escapeHTML(c.description)}</p>
     <div class="flex flex-wrap justify-center gap-4 reveal">
@@ -428,7 +469,7 @@ function renderContact() {
         ${escapeHTML(c.buttonText)}
       </a>
       <button id="copy-email-btn" type="button" class="inline-flex items-center gap-2 border border-hair hover:border-amber/50 text-text font-mono text-sm py-3.5 px-6 rounded-lg transition-colors">
-        <i class="far fa-copy" aria-hidden="true"></i> <span id="copy-email-label">copy email</span>
+        <i class="far fa-copy" aria-hidden="true"></i> <span id="copy-email-label">${escapeHTML(t('contact.copyEmail'))}</span>
       </button>
     </div>
   `;
@@ -437,12 +478,12 @@ function renderContact() {
     const label = $('copy-email-label');
     try {
       await navigator.clipboard.writeText(portfolioData.meta.email);
-      showToast('Email copied to clipboard');
-      label.textContent = 'copied!';
+      showToast(t('contact.copiedToast'));
+      label.textContent = t('contact.copied');
     } catch {
       label.textContent = portfolioData.meta.email;
     }
-    setTimeout(() => { label.textContent = 'copy email'; }, 1800);
+    setTimeout(() => { label.textContent = t('contact.copyEmail'); }, 1800);
   });
 }
 
@@ -458,24 +499,24 @@ function renderFooterAndLinks() {
       </div>
       <p class="text-muted font-mono text-xs">
         <a href="${s.github}" target="_blank" rel="noopener noreferrer" class="link-underline hover:text-text transition-colors">
-          designed &amp; built by ${escapeHTML(portfolioData.meta.name)} · ${year}
+          ${escapeHTML(t('footer.builtBy'))} ${escapeHTML(portfolioData.meta.name)} · ${year}
         </a>
       </p>
     </footer>
 
-    <div class="hidden md:flex fixed left-10 bottom-0 flex-col items-center gap-6 z-40 after:content-[''] after:block after:w-px after:h-24 after:bg-hair">
+    <div class="hidden md:flex fixed start-10 bottom-0 flex-col items-center gap-6 z-40 after:content-[''] after:block after:w-px after:h-24 after:bg-hair">
       <a href="${s.github}" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-amber hover:-translate-y-1 transition-all duration-200" aria-label="GitHub"><i class="fab fa-github text-lg" aria-hidden="true"></i></a>
       <a href="${s.linkedin}" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-amber hover:-translate-y-1 transition-all duration-200" aria-label="LinkedIn"><i class="fab fa-linkedin text-lg" aria-hidden="true"></i></a>
       <a href="${s.twitter}" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-amber hover:-translate-y-1 transition-all duration-200" aria-label="Twitter"><i class="fab fa-twitter text-lg" aria-hidden="true"></i></a>
     </div>
 
-    <div class="hidden md:flex fixed right-10 bottom-0 flex-col items-center gap-6 z-40 after:content-[''] after:block after:w-px after:h-24 after:bg-hair">
+    <div class="hidden md:flex fixed end-10 bottom-0 flex-col items-center gap-6 z-40 after:content-[''] after:block after:w-px after:h-24 after:bg-hair">
       <a href="mailto:${portfolioData.meta.email}" class="text-muted hover:text-amber hover:-translate-y-1 transition-all duration-200 font-mono text-xs" style="writing-mode: vertical-rl;">
         ${portfolioData.meta.email}
       </a>
     </div>
 
-    <button id="back-to-top" type="button" aria-label="Back to top">
+    <button id="back-to-top" type="button" aria-label="${escapeHTML(t('footer.backToTop'))}">
       <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -512,7 +553,7 @@ function applyTheme(theme) {
   const isLight = theme === 'light';
   document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach((btn) => {
     btn.setAttribute('aria-pressed', String(isLight));
-    btn.setAttribute('aria-label', isLight ? 'Switch to night mode' : 'Switch to day mode');
+    btn.setAttribute('aria-label', isLight ? t('nav.nightMode') : t('nav.dayMode'));
   });
 }
 
@@ -524,7 +565,7 @@ function initThemeToggle() {
     btn.addEventListener('click', () => {
       const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       applyTheme(next);
-      showToast(next === 'light' ? 'Day mode' : 'Night mode');
+      showToast(next === 'light' ? t('nav.dayToast') : t('nav.nightToast'));
     });
   });
 }
