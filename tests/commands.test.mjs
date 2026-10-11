@@ -18,7 +18,7 @@ const parseDoc = plain(ctx.Terminal.parseDoc);
 const parseIndex = plain(ctx.Terminal.parseIndex);
 
 const commands = parseIndex(read('terminal/index.md'));
-const builtins = ['help', 'clear', 'reset', 'ls', 'history', 'sudo', 'cat', 'engineer'];
+const builtins = ['help', 'clear', 'reset', 'ls', 'history', 'sudo', 'cat', 'engineer', 'exit'];
 
 test('index.md lists commands', () => {
   assert.ok(commands.length > 0, 'no commands found in terminal/index.md');

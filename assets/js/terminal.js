@@ -14,7 +14,7 @@ const Terminal = (() => {
   const BUILTINS = {
     help: 'list available commands',
     clear: 'clear the terminal',
-    reset: 'restore the original const',
+    reset: 'close the shell, bring back the const',
     ls: 'list command files',
     history: 'show previous commands',
   };
@@ -25,8 +25,7 @@ const Terminal = (() => {
 
   let els = {};
   let initial = null;           // { var, fields } shown on load
-  let current = null;           // { var, fields } the const currently holds
-  let constState = 'shown';     // 'shown' | 'erasing' | 'erased' | 'typing'
+  let shell = false;            // true once the visitor starts typing
   let registry = null;          // [{ name, description }]
   const aliasMap = new Map();   // alias -> command name
   const cache = new Map();      // command name -> parsed doc
@@ -191,44 +190,24 @@ const Terminal = (() => {
     tick();
   }
 
-  // Hold the window's height while the const is empty so the page doesn't jump.
-  function lockHeight(on) {
-    const box = els.code.parentElement;
-    box.style.minHeight = on ? `${box.offsetHeight}px` : '';
-  }
-
-  function setWaiting(text) {
-    els.code.innerHTML = `<span class="text-muted">${esc(text)}</span>${CARET}`;
-  }
-
-  // Backspace the const away; the window waits for the next command.
-  function eraseConst() {
-    if (constState === 'erased' || constState === 'erasing') return;
-    lockHeight(true);
-    constState = 'erasing';
-    const segs = constSegments(current.var, current.fields);
+  // First keystroke: backspace the const away, then fold its panel so the
+  // whole window becomes the terminal. Only `reset` brings it back.
+  function enterShell() {
+    if (shell) return;
+    shell = true;
+    const segs = constSegments(initial.var, initial.fields);
     animate(segs, segLength(segs), 0, 18, () => {
-      constState = 'erased';
-      setWaiting('// awaiting command…');
+      if (!shell) return;
+      els.root.classList.add('is-shell');
+      scrollToPrompt();
     });
   }
 
-  // Type a const in from empty.
-  function fillConst(varName, fields) {
-    current = { var: varName, fields };
-    lockHeight(true);
-    constState = 'typing';
-    const segs = constSegments(varName, fields);
-    animate(segs, 0, segLength(segs), 45, () => {
-      constState = 'shown';
-      lockHeight(false);
-    });
-  }
-
-  // Bring back whatever the const held before the user started typing.
-  function restoreConst() {
-    if (constState === 'shown') return;
-    fillConst(current.var, current.fields);
+  function exitShell() {
+    shell = false;
+    els.root.classList.remove('is-shell');
+    const segs = constSegments(initial.var, initial.fields);
+    animate(segs, 0, segLength(segs), 45);
   }
 
   /* ---------------- output ---------------- */
@@ -265,7 +244,8 @@ const Terminal = (() => {
   async function run(raw) {
     const input = raw.trim();
     echo(input);
-    if (!input) { restoreConst(); return; }
+    if (!input) return;
+    enterShell();
     history.push(input);
     historyIdx = history.length;
 
@@ -277,52 +257,39 @@ const Terminal = (() => {
 
     try {
       switch (cmd) {
-        case 'help': case '?': restoreConst(); print(await helpText()); return;
-        case 'clear': case 'cls': restoreConst(); els.log.innerHTML = ''; return;
-        case 'reset': case 'engineer':
-          fillConst(initial.var, initial.fields);
-          print('<span class="text-muted">// const restored</span>');
+        case 'help': case '?': print(await helpText()); return;
+        case 'clear': case 'cls': els.log.innerHTML = ''; return;
+        case 'reset': case 'exit': case 'engineer':
+          exitShell();
+          print('<span class="text-muted">// const restored — start typing to open the shell again</span>');
           return;
         case 'ls': {
-          restoreConst();
           const reg = await loadRegistry();
           print(reg.map((c) => `<span class="term-cmd" data-cmd="${esc(c.name)}">${esc(c.name)}.md</span>`).join('  '));
           return;
         }
         case 'history':
-          restoreConst();
           print(history.map((h, i) => `<span class="text-muted">${String(i + 1).padStart(3)}</span>  ${esc(h)}`).join('<br>'));
           return;
         case 'sudo':
-          restoreConst();
           print('<span class="text-danger">nice try.</span> <span class="text-muted">this incident will be reported.</span>');
           return;
       }
 
       const name = await resolve(cmd);
       if (!name) {
-        restoreConst();
         print(`<span class="text-danger">command not found:</span> ${esc(cmd)} <span class="text-muted">— type</span> <span class="term-cmd" data-cmd="help">help</span>`);
         return;
       }
-      eraseConst();
-      const [doc] = await Promise.all([loadCommand(name), waitForErase()]);
-      setWaiting(`// reading terminal/${name}.md…`);
-      await new Promise((r) => setTimeout(r, reducedMotion() ? 0 : 220));
-      fillConst(doc.meta.var || name, doc.fields);
+      const doc = await loadCommand(name);
+      if (Object.keys(doc.fields).length) {
+        print(`<pre class="term-const">${segmentsToHTML(constSegments(doc.meta.var || name, doc.fields))}</pre>`);
+      }
       if (doc.body) print(renderMarkdown(doc.body), 'term-md');
     } catch (err) {
       console.error(err);
-      restoreConst();
       print(`<span class="text-danger">error:</span> couldn't load ${esc(cmd)}.md`);
     }
-  }
-
-  function waitForErase() {
-    return new Promise((resolve) => {
-      const check = () => (constState === 'erasing' ? requestAnimationFrame(check) : resolve());
-      check();
-    });
   }
 
   async function complete() {
@@ -352,6 +319,7 @@ const Terminal = (() => {
 
   function mount(root, { varName, fields, prompt = 'guest@bilal:~$' }) {
     els = {
+      root,
       code: root.querySelector('[data-term-const]'),
       screen: root.querySelector('[data-term-screen]'),
       log: root.querySelector('[data-term-log]'),
@@ -361,7 +329,6 @@ const Terminal = (() => {
     };
     if (!els.code || !els.input) return;
     initial = { var: varName, fields };
-    current = initial;
     els.code.innerHTML = segmentsToHTML(constSegments(varName, fields));
 
     const login = new Date().toString().split(' GMT')[0];
@@ -370,7 +337,7 @@ const Terminal = (() => {
 
     // Typing anything wipes the const; deleting back to nothing restores it.
     els.input.addEventListener('input', () => {
-      if (els.input.value.trim()) eraseConst(); else restoreConst();
+      if (els.input.value.trim()) enterShell();
       syncMirror();
     });
     ['keyup', 'click', 'select', 'focus', 'blur'].forEach((ev) => els.input.addEventListener(ev, syncMirror));
@@ -386,13 +353,12 @@ const Terminal = (() => {
         run(v);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (historyIdx > 0) { els.input.value = history[--historyIdx]; eraseConst(); }
+        if (historyIdx > 0) { els.input.value = history[--historyIdx]; enterShell(); }
         syncMirror();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         historyIdx = Math.min(history.length, historyIdx + 1);
         els.input.value = history[historyIdx] ?? '';
-        if (els.input.value) eraseConst(); else restoreConst();
         syncMirror();
       } else if (e.key === 'Tab') {
         e.preventDefault();
@@ -405,7 +371,6 @@ const Terminal = (() => {
         echo(`${els.input.value}^C`);
         els.input.value = '';
         syncMirror();
-        restoreConst();
       }
     });
 

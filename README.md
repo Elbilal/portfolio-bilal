@@ -36,17 +36,17 @@ Markdown file in `terminal/`:
 
 - `terminal/index.md` lists the commands (`- name — description`); `help`
   prints this list.
-- `terminal/<name>.md` starts with a front-matter block. Its fields replace the
+- `terminal/<name>.md` starts with a front-matter block that is printed as a
   `const` object (`var:` sets the variable name, `aliases:` adds other names
   for the command); `key:` followed by `  - item` lines becomes an array. The
-  Markdown body below it is printed as the command's output (headings, bullet
-  lists, `**bold**`, `` `code` `` and `[links](url)` are supported).
+  Markdown body below it is printed after it (headings, bullet lists,
+  `**bold**`, `` `code` `` and `[links](url)` are supported).
 
-As soon as a visitor starts typing, the `const` erases itself; when the
-command runs it is retyped from that command's file (deleting the input, or
-running a built-in, brings the previous one back).
+As soon as a visitor starts typing, the `const engineer` panel erases itself
+and folds away, and the whole window becomes the shell. It stays that way until
+they run `reset` (or `exit`), which brings the panel back.
 
-Built-in commands: `help`, `ls`, `clear`, `reset`, `history`. Tab completes,
+Built-in commands: `help`, `ls`, `clear`, `reset`/`exit`, `history`. Tab completes,
 ↑/↓ walk the history, Ctrl+C cancels, Ctrl+L clears, and command names in the
 output are clickable.
 
