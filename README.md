@@ -29,6 +29,22 @@ Notes:
 - Set `hero.available: false` if you want to signal you're not open to work
   (wire this up to conditionally hide/alter the status line if desired).
 
+## Hero terminal
+
+The `profile.js` window in the hero is an interactive shell. Each command is a
+Markdown file in `terminal/`:
+
+- `terminal/index.md` lists the commands (`- name — description`); `help`
+  prints this list.
+- `terminal/<name>.md` starts with a front-matter block. Its fields replace the
+  `const` object (`var:` sets the variable name, `aliases:` adds other names
+  for the command); `key:` followed by `  - item` lines becomes an array. The
+  Markdown body below it is printed as the command's output (headings, bullet
+  lists, `**bold**`, `` `code` `` and `[links](url)` are supported).
+
+Built-in commands: `help`, `ls`, `clear`, `reset`, `history`. Tab completes,
+↑/↓ walk the history, and command names in the output are clickable.
+
 ## Local development
 
 Because the page loads content via `fetch('data.json')`, it must be served

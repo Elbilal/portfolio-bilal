@@ -1,10 +1,10 @@
 {
   "meta": {
-    "name": "Elbadaouy Bilal[cite: 1]",
+    "name": "Elbadaouy Bilal",
     "logoName": "ElbadaouyBilal",
-    "role": "Software Engineer[cite: 1]",
-    "email": "bilal.elbadaouy.work@gmail.com[cite: 1]",
-    "location": "Rabat, Morocco[cite: 1]",
+    "role": "Software Engineer",
+    "email": "bilal.elbadaouy.work@gmail.com",
+    "location": "Rabat, Morocco",
     "resume": {
       "en": "#english-version",
       "fr": "#french-version"
@@ -16,8 +16,8 @@
     },
     "seo": {
       "title": "Elbadaouy Bilal — Software Engineer",
-      "description": "Elbadaouy Bilal is a full-stack software engineer specializing in robust and scalable web and mobile applications[cite: 1]. Explore projects in Java, Spring Boot, and React[cite: 1].",
-      "canonical": "https://example.com/",
+      "description": "Elbadaouy Bilal is a full-stack software engineer specializing in robust and scalable web and mobile applications. Explore projects in Java, Spring Boot, and React.",
+      "canonical": "https://elbilal.github.io/portfolio-bilal/",
       "ogImage": "https://placehold.co/1200x630/121B1F/E3A857?text=Elbadaouy+Bilal",
       "themeColor": "#0B1215"
     }
@@ -25,13 +25,13 @@
   "hero": {
     "greeting": "hello_world();",
     "headline": "I build robust systems for the web.",
-    "description": "Full-stack software engineer specializing in designing, developing, and maintaining robust and scalable applications[cite: 1]. Currently focused on national scoring services and central platform modernization at Bank Al-Maghrib[cite: 1].",
+    "description": "Full-stack software engineer specializing in designing, developing, and maintaining robust and scalable applications. Currently focused on national scoring services and central platform modernization at Bank Al-Maghrib.",
     "ctaText": "See the work",
     "image": "https://placehold.co/200x200/172327/E3A857?text=EB",
     "focusAreas": [
-      "microservices architecture[cite: 1]",
-      "full-stack development[cite: 1]",
-      "AI integration[cite: 1]"
+      "microservices architecture",
+      "full-stack development",
+      "AI integration"
     ],
     "status": "open to interesting problems",
     "available": true
@@ -39,9 +39,9 @@
   "about": {
     "title": "About",
     "paragraphs": [
-      "Hello! I'm Bilal, a full-stack software engineer motivated by technical challenges and passionate about innovation[cite: 1]. My focus is on designing, developing, and maintaining robust and scalable web and mobile applications[cite: 1].",
-      "I graduated from ENSA Fès with a degree in Computer Engineering[cite: 1]. Since then, I've had the chance to work across agritech, enterprise software, and national banking contexts[cite: 1]. My main focus these days is building national TPE/PME scoring services and modernizing central platforms at Bank Al-Maghrib[cite: 1].",
-      "I continuously explore new tools and methods, particularly in microservices architectures and AI automation with tools like GitHub Copilot, RAG, and LLMs[cite: 1]."
+      "Hello! I'm Bilal, a full-stack software engineer motivated by technical challenges and passionate about innovation. My focus is on designing, developing, and maintaining robust and scalable web and mobile applications.",
+      "I graduated from ENSA Fès with a degree in Computer Engineering. Since then, I've had the chance to work across agritech, enterprise software, and national banking contexts. My main focus these days is building national TPE/PME scoring services and modernizing central platforms at Bank Al-Maghrib.",
+      "I continuously explore new tools and methods, particularly in microservices architectures and AI automation with tools like GitHub Copilot, RAG, and LLMs."
     ],
     "icon": "fas fa-code",
     "stats": [
@@ -51,11 +51,11 @@
       },
       {
         "value": "5",
-        "label": "professional roles[cite: 1]"
+        "label": "professional roles"
       },
       {
         "value": "3",
-        "label": "languages spoken[cite: 1]"
+        "label": "languages spoken"
       }
     ]
   },
@@ -63,51 +63,51 @@
     "title": "Technical skills",
     "categories": [
       {
-        "title": "Frontend[cite: 1]",
+        "title": "Frontend",
         "icon": "fas fa-desktop",
         "items": [
-          "React[cite: 1]",
-          "Angular[cite: 1]",
-          "TypeScript[cite: 1]",
-          "Material UI[cite: 1]",
-          "Bootstrap[cite: 1]",
-          "Redux[cite: 1]"
+          "React",
+          "Angular",
+          "TypeScript",
+          "Material UI",
+          "Bootstrap",
+          "Redux"
         ]
       },
       {
-        "title": "Backend[cite: 1]",
+        "title": "Backend",
         "icon": "fas fa-server",
         "items": [
-          "Java / Spring Boot[cite: 1]",
-          "Python[cite: 1]",
-          "C# / ASP.NET Core[cite: 1]",
-          "Microservices[cite: 1]",
-          "Hibernate[cite: 1]",
-          "Keycloak[cite: 1]"
+          "Java / Spring Boot",
+          "Python",
+          "C# / ASP.NET Core",
+          "Microservices",
+          "Hibernate",
+          "Keycloak"
         ]
       },
       {
         "title": "Databases & DevOps",
         "icon": "fas fa-tools",
         "items": [
-          "Oracle[cite: 1]",
-          "PostgreSQL[cite: 1]",
-          "Docker & Kubernetes[cite: 1]",
-          "GitLab CI/CD[cite: 1]",
-          "MongoDB[cite: 1]",
-          "Firebase[cite: 1]"
+          "Oracle",
+          "PostgreSQL",
+          "Docker & Kubernetes",
+          "GitLab CI/CD",
+          "MongoDB",
+          "Firebase"
         ]
       },
       {
-        "title": "AI & Automation[cite: 1]",
+        "title": "AI & Automation",
         "icon": "fas fa-robot",
         "items": [
-          "GitHub Copilot[cite: 1]",
-          "Prompt Engineering[cite: 1]",
-          "RAG[cite: 1]",
-          "Ollama[cite: 1]",
-          "LLMs[cite: 1]",
-          "Claude CLI[cite: 1]"
+          "GitHub Copilot",
+          "Prompt Engineering",
+          "RAG",
+          "Ollama",
+          "LLMs",
+          "Claude CLI"
         ]
       }
     ]
@@ -116,14 +116,14 @@
     "title": "Selected work",
     "featured": [
       {
-        "title": "National TPE/PME Scoring Services[cite: 1]",
+        "title": "National TPE/PME Scoring Services",
         "type": "Featured project",
-        "description": "Designed and developed national scoring services for TPE/PME at Bank Al-Maghrib. Modeled business specifications and workflows via Vizor Builder[cite: 1].",
+        "description": "Designed and developed national scoring services for TPE/PME at Bank Al-Maghrib. Modeled business specifications and workflows via Vizor Builder.",
         "tech": [
-          "Java[cite: 1]",
-          "Spring Boot[cite: 1]",
-          "Oracle[cite: 1]",
-          "Microservices[cite: 1]"
+          "Java",
+          "Spring Boot",
+          "Oracle",
+          "Microservices"
         ],
         "github": "#",
         "live": "#",
@@ -131,14 +131,14 @@
         "reverse": false
       },
       {
-        "title": "Customer Engagement Platform[cite: 1]",
+        "title": "Customer Engagement Platform",
         "type": "Featured project",
-        "description": "Integrated and optimized a Customer Engagement platform at Sopra Banking Software. Modernized architecture into microservices and integrated a Product Management module[cite: 1].",
+        "description": "Integrated and optimized a Customer Engagement platform at Sopra Banking Software. Modernized architecture into microservices and integrated a Product Management module.",
         "tech": [
-          "React[cite: 1]",
-          "TypeScript[cite: 1]",
-          "Spring Boot[cite: 1]",
-          "Keycloak[cite: 1]"
+          "React",
+          "TypeScript",
+          "Spring Boot",
+          "Keycloak"
         ],
         "github": "#",
         "live": "#",
@@ -149,34 +149,34 @@
     "otherTitle": "Other noteworthy projects",
     "other": [
       {
-        "title": "Agritech Platform[cite: 1]",
-        "description": "Developed a responsive agritech platform with a robust backend and modern frontend interface during my time at Twins Gestion du terroir[cite: 1].",
+        "title": "Agritech Platform",
+        "description": "Developed a responsive agritech platform with a robust backend and modern frontend interface during my time at Twins Gestion du terroir.",
         "tech": [
-          "Spring Boot[cite: 1]",
-          "Angular[cite: 1]",
-          "PostgreSQL[cite: 1]"
+          "Spring Boot",
+          "Angular",
+          "PostgreSQL"
         ],
         "github": "#",
         "live": ""
       },
       {
-        "title": "Automated CMS Platform[cite: 1]",
-        "description": "Developed a CMS site with automated content workflows as a Web Developer Intern at DevBay[cite: 1].",
+        "title": "Automated CMS Platform",
+        "description": "Developed a CMS site with automated content workflows as a Web Developer Intern at DevBay.",
         "tech": [
-          "PHP[cite: 1]",
-          "Laravel[cite: 1]",
-          "Bootstrap[cite: 1]"
+          "PHP",
+          "Laravel",
+          "Bootstrap"
         ],
         "github": "#",
         "live": "#"
       },
       {
-        "title": "Product Management System Redesign[cite: 1]",
-        "description": "Modernized the architecture into microservices and translated business needs into user stories for a banking software system[cite: 1].",
+        "title": "Product Management System Redesign",
+        "description": "Modernized the architecture into microservices and translated business needs into user stories for a banking software system.",
         "tech": [
-          "Spring Boot[cite: 1]",
-          "React[cite: 1]",
-          "PostgreSQL[cite: 1]"
+          "Spring Boot",
+          "React",
+          "PostgreSQL"
         ],
         "github": "#",
         "live": ""
